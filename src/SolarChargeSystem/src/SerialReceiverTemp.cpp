@@ -1,35 +1,40 @@
-#include "SerialReceiver.h"
+#include "SerialReceiverTemp.h"
 
-SerialReceiver::SerialReceiver()
+template <class t> SerialReceiverT<t>::SerialReceiverT()
 {
     
 }
 
-void SerialReceiver::begin(Stream& serial,uint16_t bufferLength)
+template <class t>
+void SerialReceiverT<t>::begin(t& serial,uint16_t bufferLength)
 {
-    this->serial = &serial;
+    this->serial = serial;
     receiveBufferLength = bufferLength;
     receiveBuffer.reserve(bufferLength + 1);
     serial.println("Ready !");
     
+    while (true)
+    {
+        serialCheck();
+    }
 }
 
-void SerialReceiver::run()
+template <class t>
+void SerialReceiverT<t>::run()
 {
     serialCheck();
 }
 
-void SerialReceiver::serialCheck()
+template <class t>
+void SerialReceiverT<t>::serialCheck()
 {
     bool receiveFinishFlag = false;
     
-    
-    
-    while (serial->available())
+    while (serial.available())
     {
         
         // 一個字節一個字節地讀,下一句是讀到的放入字符串數組中組成一個完成的數據包
-        char incomingByte = serial->read();
+        char incomingByte = serial.read();
         
         // 緩衝區已滿
         if (receiveBuffer.length() >= receiveBufferLength)
@@ -46,19 +51,23 @@ void SerialReceiver::serialCheck()
         {
             // remove /r /n
             removeLineEnding(receiveBuffer);
-            #ifdef SM_DEBUG
-            serial->println(receiveBuffer);
-            #endif
-            onReceiveCallbackInvoke();
+            //onNewString();
         }
         receiveBuffer = "";
     }
 }
 
+template <class t>
+void SerialReceiverT<t>::onNewString()
+{
+#ifdef SM_DEBUG
+    Serial.println(receiveBuffer);
+#endif
+}
 
-
+template <class t>
 // Remove Line Ending
-void SerialReceiver::removeLineEnding(String &str)
+void SerialReceiverT<t>::removeLineEnding(String &str)
 {
     // Remove \n \r
     if (str.endsWith("\n"))
@@ -66,16 +75,4 @@ void SerialReceiver::removeLineEnding(String &str)
     ;
     if (str.endsWith("\r"))
         str.remove(str.length() - 1);
-}
-
-void SerialReceiver::onReceiveCallbackInvoke()
-{
-    if (onReceiveCallback != nullptr)
-        onReceiveCallback(onReceiveCallbackArg,receiveBuffer);
-}
-
-void SerialReceiver::setOnReceiveCallback(OnReceiveCallback callback,void* arg)
-{
-    this->onReceiveCallback = callback;
-    this->onReceiveCallbackArg = arg;
 }
