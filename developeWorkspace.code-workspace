@@ -7,5 +7,18 @@
 			"path": "src\\SolarChargeSystem"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"*.m": "matlab",
+			"xstring": "cpp",
+			"functional": "cpp",
+			"initializer_list": "cpp",
+			"list": "cpp",
+			"memory": "cpp",
+			"vector": "cpp",
+			"xhash": "cpp",
+			"xmemory": "cpp",
+			"xutility": "cpp"
+		}
+	}
 }

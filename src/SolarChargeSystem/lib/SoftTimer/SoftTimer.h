@@ -1,10 +1,10 @@
-/**
- * @ FileName:
- * @ Description:
- * @ Author: TZU-CHIEH,HSU
- * @ Modified by: TZU-CHIEH,HSU
- * @ Create Time: 2021-12-05 14:13:45
- * @ Modified time: 2021-12-05 16:20:35
+/*
+ * @ FileName		: SoftTimer.cpp
+ * @ Author			: TZU-CHIEH,HSU
+ * @ Modified by	: TZU-CHIEH,HSU
+ * @ Create Time	: 2021-12-05 14:13:11
+ * @ Modified time	: 2021-12-05 16:29:59
+ * @ Description	: A software timer implemented with millis();
  */
 
 #ifndef __SOFTTIMER_H__

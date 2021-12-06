@@ -1,14 +1,12 @@
-
 #include "SoftTimer.h"
 
-SoftTimer::SoftTimer(uint32_t interval = 0, SoftTimerCallback onExpiredCallback = NULL ,void* callbackArg=nullptr , uint32_t repeat = SOFTTIMER_INFINITY)
+SoftTimer::SoftTimer(uint32_t interval, SoftTimerCallback onExpiredCallback, void *callbackArg, uint32_t repeat)
 {
     this->interval = interval;
     this->onExpiredCallback = onExpiredCallback;
     this->onExpiredCallbackArg = callbackArg;
     this->repeatTarget = repeat;
 }
-
 
 void SoftTimer::setOnExpiredCallback(SoftTimerCallback onExpiredCallback, void *arg)
 {

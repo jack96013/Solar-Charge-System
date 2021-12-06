@@ -1,3 +1,12 @@
+/*
+ * @ FileName		: SerialManager.cpp
+ * @ Author			: TZU-CHIEH,HSU
+ * @ Modified by	: TZU-CHIEH,HSU
+ * @ Create Time	: 2021-12-04 20:03:18
+ * @ Modified time	: 2021-12-06 00:38:11
+ * @ Description	: Manager 2 serial interface
+ */
+
 #ifndef __SERIALMANAGER_H__
 #define __SERIALMANAGER_H__
 
@@ -16,7 +25,8 @@ public:
     void begin();
     void run();
     void printInfo(Stream &serial);
-    AltSoftSerial getSerialLTE();
+    AltSoftSerial* getSerialLTE();
+    SerialReceiver* getSerialLTEReceiver();
 
 private:
     AltSoftSerial SerialLTE; // LTE Module

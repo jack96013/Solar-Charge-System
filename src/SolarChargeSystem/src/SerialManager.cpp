@@ -1,3 +1,5 @@
+
+
 #include "SerialManager.h"
 #include "config\Config.h"
 
@@ -38,20 +40,24 @@ void SerialManager::printInfo(Stream &serial)
     serial.print(F("=========================\n"));
 }
 
-AltSoftSerial SerialManager::getSerialLTE()
+AltSoftSerial* SerialManager::getSerialLTE()
 {
-    return SerialLTE;
+    return &SerialLTE;
+}
+
+SerialReceiver* SerialManager::getSerialLTEReceiver() 
+{
+    return &serialLTEReceiver;
 }
 
 void SerialManager::serialOnReceive(void *arg, String &payload)
 {
-
     Serial.println(payload);
 }
 
 void SerialManager::serialLTEOnReceive(void *arg, String &payload)
 {
-    SerialManager& _this = *(SerialManager*)arg;   
+    SerialManager &_this = *(SerialManager *)arg;
     _this.SerialLTE.println(payload);
     if (payload.indexOf("AT2") != 0)
         _this.failCount++;
