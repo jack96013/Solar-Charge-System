@@ -3,7 +3,7 @@
  * @ Author			: TZU-CHIEH,HSU
  * @ Modified by	: TZU-CHIEH,HSU
  * @ Create Time	: 2021-12-05 14:13:11
- * @ Modified time	: 2021-12-05 16:29:59
+ * @ Modified time	: 2021-12-10 23:28:57
  * @ Description	: A software timer implemented with millis();
  */
 
@@ -22,13 +22,13 @@ class SoftTimer
     //SoftTimer(uint32_t interval, SoftTimerCallback onExpiredCallback ,void* callbackArg);
     //SoftTimer(uint32_t interval, SoftTimerCallback onExpiredCallback ,uint32_t repeat);
     //SoftTimer(uint32_t interval, SoftTimerCallback onExpiredCallback);
-    //SoftTimer();
     void setOnExpiredCallback(SoftTimerCallback onExpiredCallback,void* arg);
     void setInterval(uint32_t interval);
     void setRepeats(uint32_t repeat);
     uint32_t getTargetTime();
 
     void run();
+    void delay(uint32_t delay);
 
     void stop();
     void start();
@@ -42,7 +42,7 @@ class SoftTimer
     uint32_t getRemainingTime();
     uint32_t getRemainingRepeats();  // Number of repeats remaining.
 
-    
+    void clearSettings();
 
   private:
     enum { RUNNING, STOPPED, EXPIRED } state;

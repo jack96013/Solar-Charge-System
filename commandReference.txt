@@ -1,0 +1,37 @@
+GSM(GPRS)
+NBIOT
+CATM1
+
+
+// 網路
+
+（1） AT // 同步波特率
+（2） AT+CSQ // 查询信号质量
+（3） AT+CPIN? // 检测是否读到卡
+OK 讀到卡
+ERROR 
+
+（4）选择相应网络 // 请参考 3.5 节网络注册
+
+    (2) LET 网络制式选择
+    发送： AT+CMNB=?
+    响应： +CMNB: ((1-Cat-M),(2-NB-IoT),(3-Cat-M And NB-IoT))
+    OK
+    说明：
+    1-Cat-M AT+CMNB=1 设置 CAT-M1 模式
+    2-NB-IoT AT+CMNB=2 设置 NB-IoT 模式
+    3-Cat-M And NB-IoT AT+CMNB=3 设置 CAT-M1 和 NB-IoT 组合模式
+    如果使用 GPRS 网络，跳过此步骤
+
+    註冊網路
+    AT+CGDCONT=1,"IP","internet.iot" OK
+    AT+CGDCONT=1,"IP",""    //自動設定APN
+
+    
+
+
+
+（5） AT+COPS?/AT+CREG? // 查询模块是否注册网络
+（6） AT+CGATT? // 查询是否附着网络
+
+

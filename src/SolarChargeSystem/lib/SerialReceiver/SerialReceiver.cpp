@@ -10,7 +10,7 @@ void SerialReceiver::begin(Stream& serial,uint16_t bufferLength)
     this->serial = &serial;
     receiveBufferLength = bufferLength;
     receiveBuffer.reserve(bufferLength + 1);
-    serial.println("Ready !");
+    //serial.println("Ready !");
     
 }
 
@@ -22,8 +22,6 @@ void SerialReceiver::run()
 void SerialReceiver::serialCheck()
 {
     bool receiveFinishFlag = false;
-    
-    
     
     while (serial->available())
     {
@@ -38,7 +36,10 @@ void SerialReceiver::serialCheck()
         }
         receiveBuffer += (char)incomingByte; // 將字元一個個串接
         if (incomingByte == SM_ENDMARK)
+        {
             receiveFinishFlag = true;
+            break;
+        }
     }
     if (receiveFinishFlag)
     {
@@ -78,4 +79,10 @@ void SerialReceiver::setOnReceiveCallback(OnReceiveCallback callback,void* arg)
 {
     this->onReceiveCallback = callback;
     this->onReceiveCallbackArg = arg;
+}
+
+void SerialReceiver::clearBuffer()
+{
+    receiveBuffer = "";
+    serial->flush();
 }

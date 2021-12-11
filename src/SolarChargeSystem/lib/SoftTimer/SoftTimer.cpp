@@ -14,6 +14,7 @@ void SoftTimer::setOnExpiredCallback(SoftTimerCallback onExpiredCallback, void *
     this->onExpiredCallbackArg = arg;
 }
 
+
 void SoftTimer::setInterval(uint32_t interval)
 {
     this->interval = interval;
@@ -42,6 +43,13 @@ void SoftTimer::run()
             onExpiredInvoke();
         }
     }
+}
+
+void SoftTimer::delay(uint32_t delay)
+{
+    setInterval(delay);
+    setRepeats(1);
+    start();
 }
 
 void SoftTimer::stop()
@@ -85,4 +93,17 @@ void SoftTimer::onExpiredInvoke()
 {
     if (onExpiredCallback)
         onExpiredCallback(*this, onExpiredCallbackArg);
+}
+
+void SoftTimer::clearSettings()
+{
+    this->interval = 0;
+    this->onExpiredCallback = nullptr;
+    this->onExpiredCallbackArg = nullptr;
+    this->repeatTarget = INFINITY;
+}
+
+uint32_t  SoftTimer::getRemainingTime()
+{
+    return millis()-startTime;
 }

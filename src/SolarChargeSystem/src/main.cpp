@@ -3,7 +3,7 @@
  * @ Author			: TZU-CHIEH,HSU
  * @ Modified by	: TZU-CHIEH,HSU
  * @ Create Time	: 2021-12-04 14:57:43
- * @ Modified time	: 2021-12-06 22:13:42
+ * @ Modified time	: 2021-12-11 15:54:47
  * @ Description	: Program Entry Point.
  */
 
@@ -25,6 +25,7 @@ void onExpiredCallback(SoftTimer &timer, void *arg);
 
 SoftTimer sTimer1(3000, onExpiredCallback, nullptr, 3);
 
+unsigned long testMillis;
 
 
 void setup()
@@ -38,9 +39,14 @@ void setup()
 
 void loop()
 {
+    testMillis = millis();
     serialManager.run();
     batteryBalance.run();
+    lte.run();
     testModuleRun();
+    //unsigned long elapsed = millis()-testMillis;
+    // if (elapsed>1)
+    //     Serial.println(elapsed);
 }
 
 void testModuleBegin()

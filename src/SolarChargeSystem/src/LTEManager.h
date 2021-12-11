@@ -13,7 +13,6 @@ class LTEManager
     void begin();
     void run();
     void moduleSetupLoop();
-    
 
     private:
     enum class MainProgress {
@@ -22,23 +21,33 @@ class LTEManager
     };
 
     enum class SetupProgress {
-        Main,
+        Initial,
+        Check,
+        CheckWait,
         MainWait,
         GetModule,
         GetImei,
+        CheckRSSI,
+        CheckRSSIWait,
+        CheckSIM,
+        RegisterNetwork,
+        UNKNOWN,
+        
     };
 
 
     MainProgress mainProgress = MainProgress::ModuleSetup;
-    SetupProgress setupProgress = SetupProgress::Main;
+    SetupProgress setupProgress = SetupProgress::Initial;
 
     AsyncLTE LTE;
     SerialManager* serialManager;
-    Stream* serialLTE;
-    SerialReceiver* serialLTEReceiver;
+    AltSoftSerial* serialLTE;
+    // Stream* serialLTE;
+
+    //SerialReceiver* serialLTEReceiver;
     static void serialOnReceive(void *arg, String &payload);
 
-    
+    SoftTimer delayTimer;
 
 };
 

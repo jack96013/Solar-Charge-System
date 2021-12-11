@@ -3,7 +3,7 @@
  * @ Author			: TZU-CHIEH,HSU
  * @ Modified by	: TZU-CHIEH,HSU
  * @ Create Time	: 2021-12-04 20:03:18
- * @ Modified time	: 2021-12-06 00:38:11
+ * @ Modified time	: 2021-12-10 01:17:48
  * @ Description	: Manager 2 serial interface
  */
 
@@ -14,7 +14,7 @@
 #include <AltSoftSerial.h>
 
 #include "SerialReceiverTemp.h"
-#include "SerialReceiver.h"
+#include <SerialReceiver.h>
 #include "config/Config.h"
 
 class SerialManager
@@ -26,17 +26,17 @@ public:
     void run();
     void printInfo(Stream &serial);
     AltSoftSerial* getSerialLTE();
-    SerialReceiver* getSerialLTEReceiver();
+    //SerialReceiver* getSerialLTEReceiver();
 
 private:
     AltSoftSerial SerialLTE; // LTE Module
     SerialReceiver serialReceiver;
-    SerialReceiver serialLTEReceiver;
+    //SerialReceiver serialLTEReceiver;
 
 
     // Callback
     static void serialOnReceive(void *arg, String &payload);
-    static void serialLTEOnReceive(void *arg, String &payload);
+    //static void serialLTEOnReceive(void *arg, String &payload);
 
     int failCount = 0;
 

@@ -3,7 +3,7 @@
  * @ Author			: TZU-CHIEH,HSU
  * @ Modified by	: TZU-CHIEH,HSU
  * @ Create Time	: 2021-12-04 15:25:24
- * @ Modified time	: 2021-12-05 16:37:24
+ * @ Modified time	: 2021-12-11 02:14:49
  * @ Description	: Serial receive handler
  */
 
@@ -15,7 +15,7 @@
 #define SM_ENDMARK '\n'
 #define SM_LENGTH 100
 
-#define SM_DEBUG
+//#define SM_DEBUG
 
 using namespace std;
 
@@ -29,14 +29,15 @@ public:
     void run();
     static void removeLineEnding(String &str);
     void setOnReceiveCallback(OnReceiveCallback callback, void *arg);
+    virtual void clearBuffer();
 
-private:
+protected:
     Stream *serial;
 
     unsigned int receiveBufferLength;
     String receiveBuffer;
 
-    void serialCheck();
+    virtual void serialCheck();
     void onReceiveCallbackInvoke();
     OnReceiveCallback onReceiveCallback;
     void *onReceiveCallbackArg;
