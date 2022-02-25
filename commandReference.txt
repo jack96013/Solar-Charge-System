@@ -28,9 +28,6 @@ ERROR
     AT+CGDCONT=1,"IP",""    //自動設定APN
 
     
-
-
-
 （5） AT+COPS?/AT+CREG? // 查询模块是否注册网络
 （6） AT+CGATT? // 查询是否附着网络
 

@@ -13,6 +13,7 @@ class LTEManager
     void begin();
     void run();
     void moduleSetupLoop();
+    void disableDelay();
 
     private:
     enum class MainProgress {
@@ -30,7 +31,12 @@ class LTEManager
         CheckRSSI,
         CheckRSSIWait,
         CheckSIM,
+        CheckSIMWait,
+        SetNetworkType,
+        SetNetworkTypeWait,
         RegisterNetwork,
+        RegisterNetworkWait,
+        
         UNKNOWN,
         
     };

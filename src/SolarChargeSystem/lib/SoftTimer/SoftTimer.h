@@ -45,8 +45,8 @@ class SoftTimer
     void clearSettings();
 
   private:
-    enum { RUNNING, STOPPED, EXPIRED } state;
-    
+    enum State{ RUNNING, STOPPED, EXPIRED };
+    State state = STOPPED;
     uint32_t startTime;
     uint32_t remainingTime;
     uint32_t interval;

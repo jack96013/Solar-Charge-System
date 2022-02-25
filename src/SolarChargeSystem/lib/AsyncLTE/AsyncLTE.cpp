@@ -2,6 +2,7 @@
 
 AsyncLTE::AsyncLTE()
 {
+
 }
 
 AsyncLTEResultBase* AsyncLTE::begin(Stream *serial)
@@ -18,9 +19,9 @@ AsyncLTEResultBase* AsyncLTE::begin(Stream *serial)
 
     DEBUG_PRINTLN("Begin");
     
-    resultHandler.clear();
+    //resultHandler.clear();
 
-    return &resultHandler;
+    return nullptr;
 
 
 }
@@ -40,9 +41,9 @@ AsyncLTEState AsyncLTE::check()
     if (isBusy())
         return AsyncLTEState::BUSY;
     sendAT();
-    resultHandler.clear();
-    resultHandler.start();
-    serialReceiver.clearBuffer();
+    //resultHandler.clear();
+    //resultHandler.start();
+    serialReceiver.startWaitForResult();
     return AsyncLTEState::SUCCESSFUL;
 }
 
@@ -70,42 +71,51 @@ void AsyncLTE::getBatteryVoltage()
 {
 }
 
-AsyncLTEState AsyncLTE::getRSSI()
+AsyncLTEState AsyncLTE::requestRSSI()
 {
     if (isBusy())
         return AsyncLTEState::BUSY;
     sendAT("CSQ");
 
-    serialReceiver.clearBuffer();
-    resultHandler.clear();
-    resultHandler.setOnReceived(getRssiHandler,this);
-    resultHandler.start();
-    
+    serialReceiver.startWaitForResult();
+
     return AsyncLTEState::SUCCESSFUL;
+}
+
+
+void AsyncLTE::getSIMStatus() 
+{
+    
+}
+
+int AsyncLTE::getRSSI()
+{
+    if (!serialReceiver.isOK())
+        return -1;
+    
+    String* result = serialReceiver.getBuffer();
+    
+    int startIndex = result->indexOf(": ")+1;
+    int endIndex = result->indexOf(",");
+    if (startIndex == -1 || endIndex == -1)
+        return -1;
+        
+    int16_t val = result->substring(startIndex+1,endIndex).toInt();
+    if (val < 0 || val > 31)
+        return -1;
+
+    val = map(val,0,31,0,100);
+    return val;
+}
+
+bool AsyncLTE::setFunctionality(uint8_t option) 
+{
+    
 }
 
 void AsyncLTE::getRssiHandler(void* base,String* sender,void* arg)
 {
-    AsyncLTEResultBase *result = (AsyncLTEResultBase*)base;
     
-    int startIndex = sender->indexOf(": ")+1;
-    int endIndex = sender->indexOf(",");
-    if (startIndex == -1 || endIndex == -1)
-    {
-        result->returnFail();
-        return;
-    }
-        
-    int16_t val = sender->substring(startIndex+1,endIndex).toInt();
-    if (val < 0 || val > 31)
-    {
-        result->returnResult(0);
-        return;
-    }
-    Serial.print("[current]");
-    val = map(val,0,31,0,100);
-    Serial.println(val);
-    result->returnResult(val);
 }
 
 bool AsyncLTE::enableSleepMode(bool onoff)
@@ -128,15 +138,56 @@ bool AsyncLTE::setNetLED(bool onoff, uint8_t mode, uint16_t timer_on, uint16_t t
 {
 }
 
-uint8_t AsyncLTE::getSIMCCID(char *ccid)
+AsyncLTEState AsyncLTE::requestSIMCCID()
 {
+    return sendGeneralCommand("CCID");
 }
+
+int AsyncLTE::getSIMCCID(char *ccid,size_t length)
+{
+    if (!serialReceiver.isOK())
+        return -1;
+    
+    String* result = serialReceiver.getBuffer();
+    strncpy(ccid,result->c_str(),length);
+    
+    return 1;
+}
+
+AsyncLTEState AsyncLTE::setPreferredLTEMode(uint8_t mode)
+{
+    char command[8]="";
+    strcat(command,"CMNB=");
+    char charValue = mode+'0';
+    strncat(command,&charValue,1);
+    Serial.println(command);
+    return sendGeneralCommand(command,2000);
+}
+
+AsyncLTEState AsyncLTE::setNetworkSettings(const __FlashStringHelper* apn, const __FlashStringHelper* username=0, const __FlashStringHelper* password=0)
+{
+    //AT+CGDCONT=1,"IP","internet.iot"
+    //F("AT+CGDCONT=1,\"IP\",");
+    if (isBusy())
+        return AsyncLTEState::BUSY;
+
+    serial->print(F("AT+"));
+    serial->print(F("CGDCONT=1,\"IP\","));
+    serial->print('\"');
+    serial->print(apn);
+    serial->println('\"');
+    
+
+    serialReceiver.startWaitForResult(2000);
+    return AsyncLTEState::SUCCESSFUL;
+}
+
 
 void AsyncLTE::onReceiveInvoke(String &data)
 {
     // if (resultHandler)
     //     resultHandler->onReceivedInvoke(&data);
-    resultHandler.onReceivedInvoke(&data);
+    // resultHandler.onReceivedInvoke(&data);
 }
 
 void AsyncLTE::setReceiveTimeout(uint16_t timeout)
@@ -145,7 +196,8 @@ void AsyncLTE::setReceiveTimeout(uint16_t timeout)
 
 bool AsyncLTE::isBusy()
 {
-    return !resultHandler.isCompleted();
+    return serialReceiver.getState() == AsyncLTESerialState::WAITING;
+    //return !resultHandler.isCompleted();
 }
 
 // AsyncLTEResult<bool> *AsyncLTE::checkOK()
@@ -194,22 +246,28 @@ bool AsyncLTE::createNewResultHandler()
 }
 
 
-void AsyncLTE::serialOnReceive(void *arg, String &payload,AsyncLTEReponseType status)
+void AsyncLTE::serialOnReceive(void *arg, String &payload,AsyncLTESerialState state)
 {
     AsyncLTE* _this = (AsyncLTE*)arg;
-    if (status == AsyncLTEReponseType::OK)
+
+    DEBUG_PRINTHEAD();
+
+    DEBUG_PRINT(F("OK , RESPONSE TYPE:"));
+    if (state == AsyncLTESerialState::OK)
     {
-        _this->resultHandler.returnSuccessful();
-        Serial.print("[OK]");
+        //_this->resultHandler.returnSuccessful();
+        DEBUG_PRINT(F("OK , RECEIVE :"));
+        DEBUG_PRINTLN(payload);
     }    
     else
     {
-        _this->resultHandler.returnFail();
-        Serial.print("[ERROR]");
+        //_this->resultHandler.returnFail();
+        
+        DEBUG_PRINTLN(F("ERROR"));
     }
-    Serial.println(payload);
+    
 
-    _this->resultHandler.onReceivedInvoke(&payload);
+    //_this->resultHandler.onReceivedInvoke(&payload);
     
     //_this->serial.println(payload);
 }
@@ -223,15 +281,22 @@ void AsyncLTE::sendAT()
 void AsyncLTE::sendAT(const char* command)
 {
     serial->print(F("AT"));
-    Serial.println(F("AT"));
+    
+    DEBUG_PRINTHEAD();
+    DEBUG_PRINT(F("-> AT"));
+    
     if (strcmp(command,""))
     {
-        Serial.print(F("+"));
+        DEBUG_PRINT(F("+"));
+        DEBUG_PRINT(command);
+
         serial->print(F("+"));
         serial->println(command);
     }
     else
-    serial->println();
+        serial->println();
+
+    DEBUG_PRINTLN();
 }
 
 void AsyncLTE::sendAT(String* command)
@@ -241,23 +306,35 @@ void AsyncLTE::sendAT(String* command)
 
 bool AsyncLTE::isComplete()
 {
-    return resultHandler.isCompleted();
+    return !isBusy();
 }
 
 bool AsyncLTE::isSuccessful()
 {
-    return !resultHandler.isFail();
+    return serialReceiver.isOK();
 }
 
 AsyncLTEResultBase* AsyncLTE::getResult()
 {
-    return &resultHandler;
+    return nullptr;
 }
 
-void resultOnTimeout(SoftTimer&,void* arg)
+AsyncLTEState AsyncLTE::sendGeneralCommand(const char* command,uint32_t timeout)
 {
-    AsyncLTE* _base = (AsyncLTE*)arg;
-    _base->resultHandler.clear();
+    if (isBusy())
+        return AsyncLTEState::BUSY;
+    sendAT(command);
+    serialReceiver.startWaitForResult(timeout);
+    return AsyncLTEState::SUCCESSFUL;
+}
+
+//
+// When the request is timeout
+//
+void AsyncLTE::resultOnTimeout(SoftTimer&,void* arg)
+{
+    AsyncLTE* _this = (AsyncLTE*)arg;
+    _this->result.state = AsyncLTEState::FAIL;
 }
 
 //

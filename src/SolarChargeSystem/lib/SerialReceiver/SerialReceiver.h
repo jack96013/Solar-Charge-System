@@ -3,7 +3,7 @@
  * @ Author			: TZU-CHIEH,HSU
  * @ Modified by	: TZU-CHIEH,HSU
  * @ Create Time	: 2021-12-04 15:25:24
- * @ Modified time	: 2021-12-11 02:14:49
+ * @ Modified time	: 2021-12-11 17:27:18
  * @ Description	: Serial receive handler
  */
 
@@ -30,6 +30,7 @@ public:
     static void removeLineEnding(String &str);
     void setOnReceiveCallback(OnReceiveCallback callback, void *arg);
     virtual void clearBuffer();
+    String* getBuffer();
 
 protected:
     Stream *serial;

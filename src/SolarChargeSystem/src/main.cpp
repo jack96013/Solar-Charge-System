@@ -12,11 +12,12 @@
 #include "BatteryBalance.h"
 #include "SoftTimer.h"
 #include "LTEManager.h"
+#include "SDCardHelper.h"
 
 SerialManager serialManager; // Serial 相關
 BatteryBalance batteryBalance;
 LTEManager lte(serialManager);
-
+SDCardHelper sdCardHelper;
 
 // 代碼測試用
 void testModuleBegin();
@@ -28,11 +29,15 @@ SoftTimer sTimer1(3000, onExpiredCallback, nullptr, 3);
 unsigned long testMillis;
 
 
+
 void setup()
 {
+    
     serialManager.begin();
+    sdCardHelper.begin();
+
     batteryBalance.begin(); // 電池平衡
-    testModuleBegin();
+    //testModuleBegin();
     lte.begin();
     
 }

@@ -86,3 +86,8 @@ void SerialReceiver::clearBuffer()
     receiveBuffer = "";
     serial->flush();
 }
+
+String* SerialReceiver::getBuffer()
+{
+    return &receiveBuffer;
+}

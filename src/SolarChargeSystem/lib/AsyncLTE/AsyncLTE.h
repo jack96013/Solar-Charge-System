@@ -3,7 +3,7 @@
  * @ Author			: TZU-CHIEH,HSU
  * @ Modified by	: TZU-CHIEH,HSU
  * @ Create Time	: 2021-12-05 13:35:56
- * @ Modified time	: 2021-12-11 16:10:14
+ * @ Modified time	: 2021-12-30 16:48:13
  * @ Description	: The SIM7000 base lib.
  */
 
@@ -18,10 +18,27 @@
 #define ASYNCLTE_OK F("OK")
 #define ASYNCLTE_ERROR F("ERROR")
 
-#define DEBUG_PRINTLN(x)  Serial.print(F("LTEC")); Serial.println(F((x)));
+#define ASYNCLTE_DEBUG
+
+#ifdef ASYNCLTE_DEBUG
+#define DEBUG_PRINTHEAD()     Serial.print(F("+[LTEC] "))
+#define DEBUG_PRINT(x)      Serial.print(x)
+#define DEBUG_PRINTLN(x)    Serial.println(x)
+#define DEBUG_PRINTSTR(x)   DEBUG_PRINTHEAD(); Serial.println(x)
+#elif
+#define DEBUG_PRINT(x)
+#define DEBUG_PRINTLN(x);
+#endif
 
 enum class AsyncLTEReponseType{OK,ERROR};
 enum class AsyncLTEState{SUCCESSFUL,FAIL,BUSY};
+
+//
+// Options
+//
+#define ASYNCLTE_LTEMODE_CATM1 1
+#define ASYNCLTE_LTEMODE_NBIOT 2
+#define ASYNCLTE_LTEMODE_BOTH 3
 
 
 class AsyncLTE
@@ -44,8 +61,11 @@ public:
     void getBatteryPercent();
     void getBatteryVoltage();
     
-    AsyncLTEState getRSSI(void);
-    int getRSSIValue(void);
+    AsyncLTEState requestRSSI(void);
+
+    void getSIMStatus();
+    
+    int getRSSI(void);
 
     // Functionality and operation mode settings
     bool setFunctionality(uint8_t option);                                                           // AT+CFUN command
@@ -56,9 +76,16 @@ public:
     bool setNetLED(bool onoff, uint8_t mode = 0, uint16_t timer_on = 64, uint16_t timer_off = 3000); // AT+CNETLIGHT and AT+SLEDS commands
 
     // SIM query
-    
+    AsyncLTEState requestSIMCCID();
+    int getSIMCCID(char *ccid,size_t length);
+
     uint8_t unlockSIM(char *pin);
-    uint8_t getSIMCCID(char *ccid);
+    
+
+    // Network
+    //AsyncLTEState setPreferredMode(uint8_t mode);
+    AsyncLTEState setPreferredLTEMode(uint8_t mode);
+    AsyncLTEState setNetworkSettings(const __FlashStringHelper* apn, const __FlashStringHelper* username=0, const __FlashStringHelper* password=0);
     uint8_t getNetworkStatus();
     
 
@@ -75,6 +102,8 @@ public:
     bool isComplete();
     bool isSuccessful();
     AsyncLTEResultBase* getResult();
+
+    AsyncLTEState sendGeneralCommand(const char* command,uint32_t timeout=1000);
     
 private:
     uint8_t pwr_pin;
@@ -91,8 +120,8 @@ private:
     void setResultHandler(AsyncLTEResultBase* handle);
     bool createNewResultHandler();
     
-    AsyncLTEResultBase resultHandler;
-    static void serialOnReceive(void *arg, String &payload,AsyncLTEReponseType status);
+    // AsyncLTEResultBase resultHandler;
+    static void serialOnReceive(void *arg, String &payload,AsyncLTESerialState state);
     
     static void generalOperateOnReceive();
 
@@ -112,7 +141,13 @@ private:
 
     // Begin
     
-    
+    typedef struct Result_t {
+        uint16_t timeout = 0;
+        AsyncLTEState state;
+    } Result;
+
+    Result result;
+
 };
 
 

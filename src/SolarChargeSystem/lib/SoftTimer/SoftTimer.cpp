@@ -14,7 +14,6 @@ void SoftTimer::setOnExpiredCallback(SoftTimerCallback onExpiredCallback, void *
     this->onExpiredCallbackArg = arg;
 }
 
-
 void SoftTimer::setInterval(uint32_t interval)
 {
     this->interval = interval;
@@ -27,21 +26,29 @@ void SoftTimer::setRepeats(uint32_t repeat)
 
 void SoftTimer::run()
 {
-    if (state == RUNNING)
+    if (isRunning())
     {
+
+        if (state == EXPIRED)
+        {
+            if (repeatTarget == SOFTTIMER_INFINITY)
+            {
+                state = RUNNING;
+                
+            }
+            else if (repeatCount == 0)
+                state = STOPPED;
+                
+        }
         if (millis() - startTime < interval)
             return;
-        else
-        {
-            startTime = millis();
-            if (repeatCount != SOFTTIMER_INFINITY)
-            {
-                repeatCount--;
-                if (repeatCount == 0)
-                    state = EXPIRED;
-            }
-            onExpiredInvoke();
-        }
+
+        startTime = millis();
+        state = EXPIRED;
+
+        if (repeatTarget != SOFTTIMER_INFINITY)
+            repeatCount--;
+        onExpiredInvoke();
     }
 }
 
@@ -64,9 +71,9 @@ void SoftTimer::start()
 
 void SoftTimer::startFrom(uint32_t startTime)
 {
-    state = RUNNING;
-    startTime = millis();
-    repeatCount = repeatTarget;
+    this->state = RUNNING;
+    this->startTime = startTime;
+    this->repeatCount = repeatTarget;
 }
 
 void SoftTimer::reset()
@@ -81,7 +88,11 @@ void SoftTimer::forceExpired()
 
 bool SoftTimer::isRunning()
 {
-    return state == RUNNING;
+    // if (repeatTarget == SOFTTIMER_INFINITY)
+    // {
+    //     return state == RUNNING || state == EXPIRED;
+    // }
+    return state != STOPPED;
 }
 
 bool SoftTimer::isExpired()
@@ -103,7 +114,7 @@ void SoftTimer::clearSettings()
     this->repeatTarget = INFINITY;
 }
 
-uint32_t  SoftTimer::getRemainingTime()
+uint32_t SoftTimer::getRemainingTime()
 {
-    return millis()-startTime;
+    return (startTime + interval) - millis();
 }
