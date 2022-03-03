@@ -11,4 +11,5 @@
 
 // SD Card
 #define SD_CS_PIN 6
-#define SD_FILE_NAME "log.txt"
+#define SD_FILE_BASENAME "log-"
+#define SD_FILE_TYPE "csv"

@@ -3,10 +3,12 @@
 void SDCardHelper::begin()
 {
     uint32_t startMillis = millis();
+    
     if (!sd.begin(SD_CS_PIN))
     {
         SDCARD_LOG(F("SD Card Initial Failed, ERROR : "));
-        SDCARD_PRINTLN(sd.cardErrorCode());
+        //SDCARD_PRINTLN(sd.cardErrorCode());
+        SDCARD_PRINTLN(sd.sdErrorCode());
     }
     else
     {
@@ -17,6 +19,7 @@ void SDCardHelper::begin()
     SDCARD_LOG(F("Elapsed : "));
     SDCARD_PRINT(elapsedMillis);
     SDCARD_PRINTLN("ms");
+    fileInitial();
     
 }
 
@@ -29,9 +32,9 @@ bool SDCardHelper::isReady()
     return ready;
 }
 
-SdFat& SDCardHelper::getSD()
+SdFat &SDCardHelper::getSD()
 {
-    return sd;
+    //return sd;
 }
 
 void SDCardHelper::errorPrint()
@@ -40,8 +43,9 @@ void SDCardHelper::errorPrint()
 
 void SDCardHelper::infoPrint()
 {
+    
     SDCARD_LOGLN(F("SD Card Detected"));
-    uint32_t cardSize = sd.card()->cardSize();
+    uint32_t cardSize = sd.card()->sectorCount();
     SDCARD_LOG(F("Type : "));
     switch (sd.card()->type())
     {
@@ -66,4 +70,38 @@ void SDCardHelper::infoPrint()
 
     SDCARD_LOG(F("Format : FAT"));
     SDCARD_PRINTLN(sd.vol()->fatType());
+    
+}
+
+void SDCardHelper::fileInitial()
+{
+    char fileName[13] = SD_FILE_BASENAME "00." SD_FILE_TYPE;
+    size_t base_name_size = sizeof(SD_FILE_BASENAME) / sizeof(char);
+    while (sd.exists(fileName))
+    {
+        if (fileName[base_name_size + 1] != '9')
+        {
+            fileName[base_name_size + 1]++;
+        }
+        else if (fileName[base_name_size] != '9')
+        {
+            fileName[base_name_size + 1] = '0';
+            fileName[base_name_size]++;
+        }
+        else
+        {
+            SDCARD_LOGLN(F("Can't create file name!"));
+            return;
+        }
+    }
+    if (!file.open(fileName, O_RDWR | O_CREAT | O_TRUNC))
+    {
+        SDCARD_LOG(F("Can't open file - "));
+        SDCARD_PRINTLN(fileName);
+        return;
+    }
+    SDCARD_LOG(F("Open File : "));
+    SDCARD_PRINTLN(fileName);
+    file.println(millis());
+    //file.close();
 }

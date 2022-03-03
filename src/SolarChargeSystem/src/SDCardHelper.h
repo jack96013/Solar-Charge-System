@@ -8,7 +8,6 @@
 #include "config/Config.h"
 #include "log.h"
 
-const char *SD_LOG_HEAD = "SD";
 
 #define SDCARD_PRINTHEAD()     Serial.print(F("[SD] "))
 #define SDCARD_PRINT(x)      Serial.print(x)
@@ -37,10 +36,15 @@ class SDCardHelper
         };
 
         SdFat sd;
+        SdFile file;
+
+
         bool ready = false;
 
         void errorPrint();       
         void infoPrint(); 
+        void fileInitial();
+
         //SdSpiConfig(SD_CS_PIN, SHARED_SPI, SD_SCK_MHZ(16));
 };
 

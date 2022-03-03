@@ -9,13 +9,13 @@ extern SDCardHelper sdCardHelper;
 
 class DataLogger
 {
-    public:
-        void begin();
-        void run();
-        
-        
-    private:
+public:
+    void begin();
+    void run();
 
+private:
+    SoftTimer logToFileTimer;
+    static void logToFileCallback(SoftTimer &timer, void *arg);
 };
 
 #endif
