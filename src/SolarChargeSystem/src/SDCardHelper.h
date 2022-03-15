@@ -1,3 +1,10 @@
+/*
+ * @Author: TZU-CHIEH,HSU
+ * @Date: 2022-02-23 23:37:51
+ * @LastEditors: TZU-CHIEH,HSU
+ * @LastEditTime: 2022-03-15 02:32:17
+ * @Description: 
+ */
 #ifndef __SDCARDHELPER_H__
 #define __SDCARDHELPER_H__
 
@@ -27,7 +34,9 @@ class SDCardHelper
         bool isReady();
 
         SdFat& getSD();
+        SdFile& getFile();
 
+        
     private:
         enum class SetupProgress
         {

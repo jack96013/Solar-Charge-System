@@ -6,6 +6,8 @@
 #include "SerialManager.h"
 #include "SerialReceiver.h"
 
+
+
 class LTEManager
 {
     public:
@@ -47,8 +49,9 @@ class LTEManager
 
     AsyncLTE LTE;
     SerialManager* serialManager;
-    AltSoftSerial* serialLTE;
-    // Stream* serialLTE;
+    
+    Stream*  serialLTE;
+    
 
     //SerialReceiver* serialLTEReceiver;
     static void serialOnReceive(void *arg, String &payload);

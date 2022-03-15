@@ -1,7 +1,18 @@
+/*
+ * @Author: TZU-CHIEH,HSU
+ * @Date: 2021-12-04 20:03:18
+ * @LastEditors: TZU-CHIEH,HSU
+ * @LastEditTime: 2022-03-07 21:23:36
+ * @Description: 
+ */
 
 
 #include "SerialManager.h"
-#include "config\Config.h"
+// 使用軟體 Serial
+#if defined(ARDUINO_ARCH_AVR) 
+#include "AltSoftSerial.h" 
+#endif
+
 
 SerialManager::SerialManager()
 {
@@ -9,13 +20,23 @@ SerialManager::SerialManager()
 
 void SerialManager::begin()
 {
-    Serial.begin(SERIAL_BAUD);
-    SerialLTE.begin(LTE_SERIAL_BAUD);
+    Serial.begin(115200);
+    
 
-    printInfo(Serial);
+    #if defined(ARDUINO_ARCH_AVR) 
+        softSerial.begin(LTE_SERIAL_BAUD);
+        SerialLTE = &softSerial;
+    #elif defined(ARDUINO_ARCH_STM32F1)
+        Serial1.begin(115200);
+        Serial2.begin(LTE_SERIAL_BAUD);
+        SerialLTE = &Serial2;
+        
+    #endif
+    
+    printInfo(DebugSerial);
     //printInfo(SerialLTE);
 
-    serialReceiver.begin(Serial, SERIAL_BUFFER_LEN);
+    serialReceiver.begin(DebugSerial, SERIAL_BUFFER_LEN);
     //serialLTEReceiver.begin(SerialLTE, LTE_SERIAL_BUFFER_LEN);
 
     serialReceiver.setOnReceiveCallback(serialOnReceive, this);
@@ -40,9 +61,9 @@ void SerialManager::printInfo(Stream &serial)
     serial.print(F("=========================\n"));
 }
 
-AltSoftSerial* SerialManager::getSerialLTE()
+Stream* SerialManager::getSerialLTE()
 {
-    return &SerialLTE;
+    return SerialLTE;
 }
 
 // SerialReceiver* SerialManager::getSerialLTEReceiver() 
@@ -52,10 +73,10 @@ AltSoftSerial* SerialManager::getSerialLTE()
 
 void SerialManager::serialOnReceive(void *arg, String &payload)
 {
-    SerialManager* _this = arg;
+    SerialManager* _this = (SerialManager*)arg;
     Serial.println("[SEND]");
     Serial.println(payload);
-    _this->SerialLTE.println(payload);
+    //_this->SerialLTE.println(payload);
 }
 
 // void SerialManager::serialLTEOnReceive(void *arg, String &payload)

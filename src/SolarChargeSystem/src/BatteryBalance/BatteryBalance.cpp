@@ -291,8 +291,8 @@ void BatteryBalance::polling_read(void)
 {
     if (millis() - checkLastMillis >= checkInterval && millis() - checkLastMillis <= checkInterval2)
     {
-        BATTERYBALANCE_PRINTHEAD();
-        Serial.println("A");
+        // BATTERYBALANCE_PRINTHEAD();
+        // Serial.println("A");
         // Serial.println(millis()-checkLastMillis);
         checkLastMillis = millis();
         read_voltage();

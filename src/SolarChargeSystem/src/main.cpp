@@ -1,3 +1,4 @@
+
 /*
  * @ FileName		: main.cpp
  * @ Author			: TZU-CHIEH,HSU
@@ -14,14 +15,23 @@
 #include "LTEManager.h"
 #include "SDCardHelper.h"
 #include "Wire.h"
-#include "OLED.h"
+#include "OLED/OLED.h"
 #include "MainPowerMonitor.h"
+#include "usbDtrReset.h"
+#include "DataLogger.h"
 
 SerialManager serialManager; // Serial 相關
-BatteryBalance batteryBalance;
 LTEManager lte(serialManager);
-//SDCardHelper sdCardHelper;
-OLED oled;
+DataLogger dataLogger;
+
+#ifdef MODULE_BMS_EN
+BatteryBalance batteryBalance;
+#endif
+#ifdef MODULE_SD_EN
+SDCardHelper sdCardHelper;
+#endif
+
+//OLED oled;
 MainPowerMonitor mainPowerMonitor;
 
 // 代碼測試用
@@ -32,49 +42,70 @@ void onExpiredCallback(SoftTimer &timer, void *arg);
 SoftTimer sTimer1(3000, onExpiredCallback, nullptr, 3);
 
 unsigned long testMillis;
+OLED oled;
+
 
 void setup()
 {
 
     serialManager.begin();
-    //sdCardHelper.begin();
 
+#ifdef MODULE_BMS_EN
     batteryBalance.begin(); // 電池平衡
-    //testModuleBegin();
+#endif
+#ifdef MODULE_SD_EN
+    sdCardHelper.begin();
+#endif
+    dataLogger.begin();
+    
+
+    testModuleBegin();
     lte.begin();
     oled.begin();
 
     mainPowerMonitor.begin();
 }
 
-uint16_t ticks = 0;
+uint32_t ticks = 0;
 uint32_t pc_millis = 0;
 uint32_t pc_report_millis = 0;
-uint32_t max_ticks = 27404;
+//uint32_t max_ticks = 27404;
+uint32_t max_ticks = 606756;
 
 void loop()
 {
-    testMillis = millis();
+
+    //testMillis = millis();
     serialManager.run();
-    batteryBalance.run();
     lte.run();
-    testModuleRun();
+    oled.run();
+
+#ifdef MODULE_BMS_EN
+    batteryBalance.run(); // 電池平衡
+#endif
+#ifdef MODULE_SD_EN
+    sdCardHelper.run();
+#endif
+    dataLogger.run();
+
+    //testModuleRun();
+    dtrResetRun();
 
     mainPowerMonitor.run();
-    oled.run();
-    ticks ++;
-    if (millis()-pc_millis >= 1000)
+    // //oled.run();
+    ticks++;
+    if (millis() - pc_millis >= 1000)
     {
         pc_millis = millis();
-        Serial.print("Ticks : ");
-        Serial.print(ticks);
-        Serial.print("t/s , Loading ");
-        Serial.print(100 - ticks / (float)max_ticks * 100);
-        Serial.println("%");
-        
+        DebugSerial.print("Ticks : ");
+        DebugSerial.println(ticks);
+        DebugSerial.print("t/s , Loading ");
+        DebugSerial.print(100 - ticks / (float)max_ticks * 100);
+        DebugSerial.println("%");
+
         ticks = 0;
     }
-    //unsigned long elapsed = millis()-testMillis;
+    // unsigned long elapsed = millis()-testMillis;
     // if (elapsed>1)
     //     Serial.println(elapsed);
 }

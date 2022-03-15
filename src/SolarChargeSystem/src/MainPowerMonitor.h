@@ -1,3 +1,10 @@
+/*
+ * @Author: TZU-CHIEH,HSU
+ * @Date: 2022-02-26 23:37:58
+ * @LastEditors: TZU-CHIEH,HSU
+ * @LastEditTime: 2022-03-15 01:15:04
+ * @Description: 
+ */
 
 
 // HSTS016L 
@@ -11,12 +18,8 @@
 #include "config/Config.h"
 
 
-#define MAINPOWER_ADC_REF       5.00f
-#define MAINPOWER_VIN_PIN       A2
-#define MAINPOWER_VIN_GAIN      1.0f
-
-#define HST016L_REF_PIN         A0
-#define HST016L_VOUT_PIN        A1
+#define HST016L_REF_PIN         15
+#define HST016L_VOUT_PIN        16
 #define HST016L_GAIN_MV_PER_A   1.0f // 625mV / 30A = 
 
 #define HST016L_CALIBRATION_TIMES_DIVIDE 10 // Calibrate Vref per 10 times of sampling.
@@ -34,8 +37,8 @@ public:
     float getPowerWatt();
     
 private:
-    uint16_t refAdcVal = 0;
-    uint16_t currentAdcVal = 0;
+    int16_t refAdcVal = 0;
+    int16_t currentAdcVal = 0;
     uint16_t voltageAdcVal = 0;
     uint8_t calibrationDivideTimes = 0;
 

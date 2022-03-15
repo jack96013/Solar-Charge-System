@@ -164,7 +164,7 @@ AsyncLTEState AsyncLTE::setPreferredLTEMode(uint8_t mode)
     return sendGeneralCommand(command,2000);
 }
 
-AsyncLTEState AsyncLTE::setNetworkSettings(const __FlashStringHelper* apn, const __FlashStringHelper* username=0, const __FlashStringHelper* password=0)
+AsyncLTEState AsyncLTE::setNetworkSettings(const __FlashStringHelper* apn, const __FlashStringHelper* username, const __FlashStringHelper* password)
 {
     //AT+CGDCONT=1,"IP","internet.iot"
     //F("AT+CGDCONT=1,\"IP\",");

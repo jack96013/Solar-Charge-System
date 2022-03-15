@@ -1,9 +1,16 @@
+/*
+ * @Author: TZU-CHIEH,HSU
+ * @Date: 2022-02-26 23:38:47
+ * @LastEditors: TZU-CHIEH,HSU
+ * @LastEditTime: 2022-03-15 01:37:55
+ * @Description: 
+ */
 #include "MainPowerMonitor.h"
 
 void MainPowerMonitor::begin()
 {
-    pinMode(HST016L_REF_PIN,INPUT);
-    pinMode(HST016L_VOUT_PIN,INPUT);
+    pinMode(MAINPWR_MON_HALL_REF_PIN,INPUT);
+    pinMode(MAINPWR_MON_HALL_PIN,INPUT);
     sampleTimer.start();
     calibration();
 }
@@ -20,28 +27,29 @@ float MainPowerMonitor::getPowerWatt()
 
 void MainPowerMonitor::calibration()
 {
-    refAdcVal = analogRead(HST016L_REF_PIN);
+    refAdcVal = analogRead(MAINPWR_MON_HALL_REF_PIN);
 }
 
 float MainPowerMonitor::getCurrentA()
 {
-    return (currentAdcVal-refAdcVal) * MAINPOWER_ADC_REF * HST016L_GAIN_MV_PER_A / 1024;
+    return (currentAdcVal-refAdcVal) * MAINPWR_MON_VREF / 1024 * MAINPWR_MON_HALL_GAIN;
 }
 
 float MainPowerMonitor::getVoltage()
 {
-    return voltageAdcVal * MAINPOWER_ADC_REF * MAINPOWER_VIN_GAIN / 1024;
+    return voltageAdcVal * MAINPWR_MON_VREF * MAINPWR_MON_V_GAIN / 1024;
 }
 
 void MainPowerMonitor::sampleCallback(SoftTimer& timer, void* arg)
 {
     MainPowerMonitor *_this = (MainPowerMonitor*)arg;
-    _this->voltageAdcVal = analogRead(MAINPOWER_VIN_PIN);
-    _this->currentAdcVal = analogRead(HST016L_VOUT_PIN);
+    _this->voltageAdcVal = analogRead(MAINPWR_MON_V_PIN);
+    _this->currentAdcVal = analogRead(MAINPWR_MON_HALL_PIN);
+
     _this->calibrationDivideTimes ++;
     if (_this->calibrationDivideTimes == HST016L_CALIBRATION_TIMES_DIVIDE)
         _this->calibration();
+    
 
-    //Serial.println(_this->getVoltage());
     //Serial.println(_this->getCurrentA());
 }

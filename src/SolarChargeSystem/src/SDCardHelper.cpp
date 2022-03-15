@@ -34,7 +34,12 @@ bool SDCardHelper::isReady()
 
 SdFat &SDCardHelper::getSD()
 {
-    //return sd;
+    return sd;
+}
+
+SdFile& SDCardHelper::getFile()
+{
+    return file;
 }
 
 void SDCardHelper::errorPrint()
@@ -79,20 +84,22 @@ void SDCardHelper::fileInitial()
     size_t base_name_size = sizeof(SD_FILE_BASENAME) / sizeof(char);
     while (sd.exists(fileName))
     {
-        if (fileName[base_name_size + 1] != '9')
+        Serial.println(fileName);
+        if (fileName[base_name_size] != '9')
         {
-            fileName[base_name_size + 1]++;
-        }
-        else if (fileName[base_name_size] != '9')
-        {
-            fileName[base_name_size + 1] = '0';
             fileName[base_name_size]++;
+        }
+        else if (fileName[base_name_size-1] != '9')
+        {
+            fileName[base_name_size] = '0';
+            fileName[base_name_size-1]++;
         }
         else
         {
             SDCARD_LOGLN(F("Can't create file name!"));
             return;
         }
+        
     }
     if (!file.open(fileName, O_RDWR | O_CREAT | O_TRUNC))
     {
@@ -102,6 +109,6 @@ void SDCardHelper::fileInitial()
     }
     SDCARD_LOG(F("Open File : "));
     SDCARD_PRINTLN(fileName);
-    file.println(millis());
+    //file.println(millis());
     //file.close();
 }

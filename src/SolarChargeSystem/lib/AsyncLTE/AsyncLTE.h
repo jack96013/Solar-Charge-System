@@ -92,13 +92,20 @@ public:
     // IMEI
     uint8_t getIMEI(char *imei);
 
+    // MQTT
+    bool MQTT_connect();
+    bool MQTT_requestConnectionStatus();
+    bool MQTT_setParameter();
+    bool MQTT_publish();
+    bool MQTT_subscribe();
+
+    
+
     void onReceiveInvoke(String& data); // Push serial data to module
     void setReceiveTimeout(uint16_t timeout);
 
     bool isBusy();
-
     void checkOK();
-    
     bool isComplete();
     bool isSuccessful();
     AsyncLTEResultBase* getResult();
