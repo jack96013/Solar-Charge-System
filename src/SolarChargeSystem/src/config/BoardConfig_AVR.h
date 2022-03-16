@@ -24,14 +24,14 @@
 #define MAINPWR_MON_VREF    5.0f
 #define MAINPWR_MON_HALL_PIN         A1
 #define MAINPWR_MON_HALL_REF_PIN     A0    
-#define MAINPWR_MON_HALL_GAIN        32  // 20A/0.625=32
+#define MAINPWR_MON_HALL_GAIN        80  // 20A/0.625=32
 
 #define MAINPWR_MON_V_PIN            A2
 #define MAINPWR_MON_V_GAIN           1.0f    
 
 // SD CARD
 #define SD_SPI
-#define SD_CS_PIN 6
+#define SD_CS_PIN 10
 
 // MPPT MODULE
 #define MPPT_I2C

@@ -40,3 +40,10 @@
 #define SD_FILE_BASENAME "log-"
 #define SD_FILE_TYPE "csv"
 
+
+#define MPPT_DEVICES 6
+#define MPPT_ADDRESS_START 64
+#define MPPT_VIN_GAIN  4.0f
+#define MPPT_VOUT_GAIN 2.2f
+#define MPPT_I_GAIN 2.2f    // 2
+

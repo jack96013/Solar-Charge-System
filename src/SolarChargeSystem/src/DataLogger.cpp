@@ -28,9 +28,10 @@ void DataLogger::begin()
     file = &sdCardHelper.getFile();
 
     logToFileTimer.setOnExpiredCallback(logToFileCallback, this);
-    logToFileTimer.setInterval(1000);
+    logToFileTimer.setInterval(100);
     logToFileTimer.start();
     
+
     #endif
 }
 
@@ -43,7 +44,7 @@ void DataLogger::run()
 void DataLogger::printMainPowerData()
 {
     // Index
-    DATALOGGER_LOGLN(F("Record"));
+    //DATALOGGER_LOGLN(F("Record"));
     file->print(dataIndex);
     file->print(',');
     file->print(mainPowerMonitor.getCurrentA());
@@ -51,6 +52,9 @@ void DataLogger::printMainPowerData()
     file->print(mainPowerMonitor.getVoltage());
     file->println();
     dataIndex ++;
+
+    //Serial.println(mainPowerMonitor.getCurrentA());
+    
 }
 
 void DataLogger::logToFileCallback(SoftTimer &timer, void *arg)
@@ -64,7 +68,7 @@ void DataLogger::logToFileCallback(SoftTimer &timer, void *arg)
     if (_this->saveDivideCount == DATALOGGER_SAVE_DIVIDE)
     {
         _this->saveDivideCount = 0;
-        DATALOGGER_LOGLN(F("Save to file"));
+        //DATALOGGER_LOGLN(F("Save to file"));
         _this->file->sync();
     }
 }

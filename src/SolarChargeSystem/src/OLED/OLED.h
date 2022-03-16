@@ -16,5 +16,6 @@
 #include "OLED_full.h"   
 #endif
 
+#include "DataLogger.h"
 
 #endif // __OLED_H__

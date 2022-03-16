@@ -32,9 +32,11 @@ class SDCardHelper
         void printInfo();
         void log();
         bool isReady();
+    
 
         SdFat& getSD();
         SdFile& getFile();
+        char* getFileName();
 
         
     private:
@@ -46,7 +48,7 @@ class SDCardHelper
 
         SdFat sd;
         SdFile file;
-
+        char fileName[15] = SD_FILE_BASENAME "00." SD_FILE_TYPE;
 
         bool ready = false;
 

@@ -20,7 +20,7 @@ extern MainPowerMonitor mainPowerMonitor;
 extern SDCardHelper sdCardHelper;
 #endif
 
-#define DATALOGGER_SAVE_DIVIDE 3
+#define DATALOGGER_SAVE_DIVIDE 10
 
 class DataLogger
 {
@@ -35,6 +35,7 @@ private:
     SdFile* file;
     uint32_t dataIndex = 0;
     uint16_t saveDivideCount = 0;
+    
 };
 
 #endif

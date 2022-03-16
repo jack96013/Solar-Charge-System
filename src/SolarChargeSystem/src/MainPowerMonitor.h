@@ -37,8 +37,8 @@ public:
     float getPowerWatt();
     
 private:
-    int16_t refAdcVal = 0;
-    int16_t currentAdcVal = 0;
+    int16_t refAdcVal = 512;
+    int16_t currentAdcVal = 512;
     uint16_t voltageAdcVal = 0;
     uint8_t calibrationDivideTimes = 0;
 

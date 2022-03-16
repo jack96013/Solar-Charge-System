@@ -19,10 +19,12 @@
 #include "MainPowerMonitor.h"
 #include "usbDtrReset.h"
 #include "DataLogger.h"
+#include "MPPTModule\MPPTModule.h"
 
 SerialManager serialManager; // Serial 相關
 LTEManager lte(serialManager);
 DataLogger dataLogger;
+MPPTModule mpptModule;
 
 #ifdef MODULE_BMS_EN
 BatteryBalance batteryBalance;
@@ -44,7 +46,6 @@ SoftTimer sTimer1(3000, onExpiredCallback, nullptr, 3);
 unsigned long testMillis;
 OLED oled;
 
-
 void setup()
 {
 
@@ -56,14 +57,17 @@ void setup()
 #ifdef MODULE_SD_EN
     sdCardHelper.begin();
 #endif
-    dataLogger.begin();
+    
     
 
     testModuleBegin();
-    lte.begin();
+    //lte.begin();
     oled.begin();
 
     mainPowerMonitor.begin();
+    dataLogger.begin();
+
+    mpptModule.begin();
 }
 
 uint32_t ticks = 0;
@@ -77,7 +81,7 @@ void loop()
 
     //testMillis = millis();
     serialManager.run();
-    lte.run();
+    //lte.run();
     oled.run();
 
 #ifdef MODULE_BMS_EN
@@ -92,19 +96,19 @@ void loop()
     dtrResetRun();
 
     mainPowerMonitor.run();
-    // //oled.run();
-    ticks++;
-    if (millis() - pc_millis >= 1000)
-    {
-        pc_millis = millis();
-        DebugSerial.print("Ticks : ");
-        DebugSerial.println(ticks);
-        DebugSerial.print("t/s , Loading ");
-        DebugSerial.print(100 - ticks / (float)max_ticks * 100);
-        DebugSerial.println("%");
+    mpptModule.run();
+    // ticks++;
+    // if (millis() - pc_millis >= 1000)
+    // {
+    //     pc_millis = millis();
+    //     DebugSerial.print("Ticks : ");
+    //     DebugSerial.println(ticks);
+    //     DebugSerial.print("t/s , Loading ");
+    //     DebugSerial.print(100 - ticks / (float)max_ticks * 100);
+    //     DebugSerial.println("%");
 
-        ticks = 0;
-    }
+    //     ticks = 0;
+    // }
     // unsigned long elapsed = millis()-testMillis;
     // if (elapsed>1)
     //     Serial.println(elapsed);

@@ -42,6 +42,11 @@ SdFile& SDCardHelper::getFile()
     return file;
 }
 
+char* SDCardHelper::getFileName()
+{
+    return fileName;
+}
+
 void SDCardHelper::errorPrint()
 {
 }
@@ -80,7 +85,6 @@ void SDCardHelper::infoPrint()
 
 void SDCardHelper::fileInitial()
 {
-    char fileName[13] = SD_FILE_BASENAME "00." SD_FILE_TYPE;
     size_t base_name_size = sizeof(SD_FILE_BASENAME) / sizeof(char);
     while (sd.exists(fileName))
     {

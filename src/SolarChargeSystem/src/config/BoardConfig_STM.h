@@ -25,11 +25,11 @@
 
 // MAIN POWER MONITOR
 #define MAINPWR_MON_VREF    5.0f
-#define MAINPWR_MON_HALL_PIN         A1
-#define MAINPWR_MON_HALL_REF_PIN     A0    
+#define MAINPWR_MON_HALL_PIN         10
+#define MAINPWR_MON_HALL_REF_PIN     10    
 #define MAINPWR_MON_HALL_GAIN        1.0f
 
-#define MAINPWR_MON_V_PIN            A2
+#define MAINPWR_MON_V_PIN            10
 #define MAINPWR_MON_V_GAIN           1.0f    
 
 // SD CARD

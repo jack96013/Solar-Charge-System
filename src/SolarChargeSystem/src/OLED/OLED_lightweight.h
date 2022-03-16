@@ -18,8 +18,10 @@
 #include "SoftTimer.h"
 #include "MainPowerMonitor.h"
 #include "SSD1306AsciiSpi.h"
+#include "SDCardHelper.h"
 
 extern MainPowerMonitor mainPowerMonitor;
+extern SDCardHelper sdCardHelper;
 
 class OLED
 {

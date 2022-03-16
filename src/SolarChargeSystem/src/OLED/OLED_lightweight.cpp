@@ -60,6 +60,18 @@ void OLED::refreshCallback(SoftTimer &timer, void *arg)
     _this->oled.clear();
     _this->oled.setCol(10);
     _this->oled.setRow(10);
-    _this->oled.print("Elapsed  : ");
+    _this->oled.print("File : ");
+    if (sdCardHelper.isReady())
+        _this->oled.println(sdCardHelper.getFileName());
+    else
+        _this->oled.println(F("SD is not ready!"));
+    _this->oled.println();
+    _this->oled.setCol(10);
+    _this->oled.print("Voltage  : ");
     _this->oled.println(mainPowerMonitor.getVoltage());
+    _this->oled.println();
+    _this->oled.setCol(10);
+    _this->oled.print("Current  : ");
+    _this->oled.println(mainPowerMonitor.getCurrentA());
+    
 }

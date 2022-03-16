@@ -33,7 +33,7 @@ void SerialManager::begin()
         
     #endif
     
-    printInfo(DebugSerial);
+    //printInfo(DebugSerial);
     //printInfo(SerialLTE);
 
     serialReceiver.begin(DebugSerial, SERIAL_BUFFER_LEN);
