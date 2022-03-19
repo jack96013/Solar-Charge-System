@@ -20,9 +20,10 @@
 #include "usbDtrReset.h"
 #include "DataLogger.h"
 #include "MPPTModule\MPPTModule.h"
+#include "ButtonHelper.h"
 
 SerialManager serialManager; // Serial 相關
-LTEManager lte(serialManager);
+// LTEManager lte(serialManager);
 DataLogger dataLogger;
 MPPTModule mpptModule;
 
@@ -41,10 +42,12 @@ void testModuleBegin();
 void testModuleRun();
 void onExpiredCallback(SoftTimer &timer, void *arg);
 
-SoftTimer sTimer1(3000, onExpiredCallback, nullptr, 3);
+SoftTimer sTimer1(20, onExpiredCallback, nullptr, SOFTTIMER_INFINITY);
 
 unsigned long testMillis;
 OLED oled;
+
+bool button_last_state = 0;
 
 void setup()
 {
@@ -68,6 +71,8 @@ void setup()
     dataLogger.begin();
 
     mpptModule.begin();
+
+    pinMode(A3,INPUT_PULLUP);
 }
 
 uint32_t ticks = 0;
@@ -92,7 +97,7 @@ void loop()
 #endif
     dataLogger.run();
 
-    //testModuleRun();
+    testModuleRun();
     dtrResetRun();
 
     mainPowerMonitor.run();
@@ -126,5 +131,17 @@ void testModuleRun()
 
 void onExpiredCallback(SoftTimer &timer, void *arg)
 {
-    Serial.println("good");
+    
+    bool state = !digitalRead(A3);
+    if (state != button_last_state)
+    {
+        button_last_state = state;
+        if (state == HIGH)
+        {
+            Serial.println(F("CALI"));
+            mpptModule.calibrate();
+        }
+    }
+
 }
+

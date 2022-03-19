@@ -48,7 +48,11 @@ void MainPowerMonitor::sampleCallback(SoftTimer& timer, void* arg)
 
     _this->calibrationDivideTimes ++;
     if (_this->calibrationDivideTimes == HST016L_CALIBRATION_TIMES_DIVIDE)
+    {
         _this->calibration();
+        _this->calibrationDivideTimes = 0;
+    }
+        
     
 
     //Serial.println(_this->getCurrentA());

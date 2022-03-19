@@ -19,9 +19,11 @@
 #include "MainPowerMonitor.h"
 #include "SSD1306AsciiSpi.h"
 #include "SDCardHelper.h"
+#include "DataLogger.h"
 
 extern MainPowerMonitor mainPowerMonitor;
 extern SDCardHelper sdCardHelper;
+extern DataLogger dataLogger;
 
 class OLED
 {

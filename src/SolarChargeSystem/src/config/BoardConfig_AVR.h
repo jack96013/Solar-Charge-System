@@ -31,7 +31,7 @@
 
 // SD CARD
 #define SD_SPI
-#define SD_CS_PIN 10
+#define SD_CS_PIN 6
 
 // MPPT MODULE
 #define MPPT_I2C

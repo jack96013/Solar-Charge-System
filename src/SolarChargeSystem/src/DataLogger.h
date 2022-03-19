@@ -12,8 +12,9 @@
 #include <SoftTimer.h>
 #include "config/Config.h"
 #include "MainPowerMonitor.h"
-
+#include "MPPTModule/MPPTModule.h"
 extern MainPowerMonitor mainPowerMonitor;
+extern MPPTModule mpptModule;
 
 #ifdef MODULE_SD_EN
 #include "SDCardHelper.h"
@@ -28,6 +29,7 @@ public:
     void begin();
     void run();
     void printMainPowerData();
+    uint32_t getDataCounts();
 
 private:
     SoftTimer logToFileTimer;

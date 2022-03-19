@@ -44,6 +44,16 @@
 #define MPPT_DEVICES 6
 #define MPPT_ADDRESS_START 64
 #define MPPT_VIN_GAIN  4.0f
-#define MPPT_VOUT_GAIN 2.2f
-#define MPPT_I_GAIN 2.2f    // 2
+// 
+#define MPPT_VOUT_GAIN 2.20f   //2.204
+#define MPPT_I_GAIN_SEN 2.2222222f    
+#define MPPT_I_GAIN_DIV 1.576f
+#define MPPT_I_ZCO      2.52
+// CQ330G 
+// ZCO = 2.50V
+// SEN = 450mV/A
+// GAIN_SEN = 1/SEN
+// GAIN_DIV = (10k + 4.7k) / 10k = 1.47
+
+// I = (1/GAIN_DIV-ZCO)*GAIN_SEN = 
 

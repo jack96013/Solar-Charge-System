@@ -16,13 +16,21 @@ public:
     void begin();
     void run();
     void scanDevices();
+    void calibrate();
+
+    float valTemp[4] = {0};
+    float valTemp2[4] = {0};
 
 private:
     struct ADS1119Configuration configuration;
     ADS1119* deviceList[MPPT_DEVICES] = {0};
-    ADS1119 module1 = ADS1119(byte(64));
+    ADS1119 module1 = ADS1119(byte(66));
     uint16_t module1_adcVal[4] = {0};
-
+    float module1_zco[2] = {MPPT_I_ZCO,MPPT_I_ZCO};
+    ADS1119 module2 = ADS1119(byte(64));
+    uint16_t module2_adcVal[4] = {0};
+    float module2_zco[2] = {MPPT_I_ZCO,MPPT_I_ZCO};
+    
 
     SoftTimer getAdcTimer;
     static void getAdcCallback(SoftTimer &timer,void *arg);

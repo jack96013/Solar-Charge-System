@@ -64,14 +64,49 @@ void OLED::refreshCallback(SoftTimer &timer, void *arg)
     if (sdCardHelper.isReady())
         _this->oled.println(sdCardHelper.getFileName());
     else
-        _this->oled.println(F("SD is not ready!"));
-    _this->oled.println();
+        _this->oled.println(F("Not Inserted"));
     _this->oled.setCol(10);
-    _this->oled.print("Voltage  : ");
-    _this->oled.println(mainPowerMonitor.getVoltage());
-    _this->oled.println();
-    _this->oled.setCol(10);
-    _this->oled.print("Current  : ");
-    _this->oled.println(mainPowerMonitor.getCurrentA());
+    _this->oled.print(F("Datas: "));
+    _this->oled.println(dataLogger.getDataCounts());
+    //_this->oled.println();
     
+    // _this->oled.setCol(10);
+    // _this->oled.print(F("Voltage  : "));
+    // _this->oled.println(mainPowerMonitor.getVoltage());
+    // _this->oled.println();
+    // _this->oled.setCol(10);
+    // _this->oled.print(F("Current  : "));
+    // _this->oled.println(mainPowerMonitor.getCurrentA());
+    
+    _this->oled.setCol(5);
+    _this->oled.println(F("MPPT1"));
+
+    _this->oled.setCol(5);
+    _this->oled.print(F("IN  : "));
+    _this->oled.print(mpptModule.valTemp[0]);
+    _this->oled.print(F("V / "));
+    _this->oled.print(mpptModule.valTemp[1]);
+    _this->oled.println(F("A"));
+    _this->oled.setCol(5);
+    _this->oled.print(F("OUT : "));
+    _this->oled.print(mpptModule.valTemp[2]);
+    _this->oled.print(F("V / "));
+    _this->oled.print(mpptModule.valTemp[3]);
+    _this->oled.println(F("A"));
+
+    _this->oled.setCol(5);
+    _this->oled.println(F("MPPT2"));
+    _this->oled.setCol(5);
+    _this->oled.print(F("IN  : "));
+    _this->oled.print(mpptModule.valTemp[0]);
+    _this->oled.print(F("V / "));
+    _this->oled.print(mpptModule.valTemp[1]);
+    _this->oled.println(F("A"));
+    _this->oled.setCol(5);
+    _this->oled.print(F("OUT : "));
+    _this->oled.print(mpptModule.valTemp[2]);
+    _this->oled.print(F("V / "));
+    _this->oled.print(mpptModule.valTemp[3]);
+    _this->oled.println(F("A"));
+    //_this->oled.println(mainPowerMonitor.getCurrentA());
 }

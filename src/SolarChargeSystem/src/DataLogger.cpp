@@ -45,11 +45,26 @@ void DataLogger::printMainPowerData()
 {
     // Index
     //DATALOGGER_LOGLN(F("Record"));
+    
+    
+    // file->print(dataIndex);
+    // file->print(',');
+    // file->print(mainPowerMonitor.getCurrentA());
+    // file->print(',');
+    // file->print(mainPowerMonitor.getVoltage());
+    // file->println();
+    // dataIndex ++;
+    
+    
     file->print(dataIndex);
     file->print(',');
-    file->print(mainPowerMonitor.getCurrentA());
+    file->print(mpptModule.valTemp[0],4);
     file->print(',');
-    file->print(mainPowerMonitor.getVoltage());
+    file->print(mpptModule.valTemp[1],4);
+    file->print(',');
+    file->print(mpptModule.valTemp[2],4);
+    file->print(',');
+    file->print(mpptModule.valTemp[3],4);
     file->println();
     dataIndex ++;
 
@@ -71,4 +86,10 @@ void DataLogger::logToFileCallback(SoftTimer &timer, void *arg)
         //DATALOGGER_LOGLN(F("Save to file"));
         _this->file->sync();
     }
+}
+
+uint32_t DataLogger::getDataCounts()
+{
+    return dataIndex;
+
 }
