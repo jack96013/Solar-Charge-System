@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2021-12-04 15:11:45
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-03-15 00:51:22
+ * @LastEditTime: 2022-03-20 14:10:16
  * @Description:  雙平台，Arduino & STM32
  */
 
@@ -12,8 +12,10 @@
 
 
 
-#if defined(ARDUINO_ARCH_AVR) 
-#include "BoardConfig_AVR.h" 
+#if defined(__AVR_ATmega328P__) 
+#include "BoardConfig_328P.h" 
+#elif defined(__AVR_ATmega2560__)
+#include "BoardConfig_2560.h"
 #elif defined(ARDUINO_ARCH_STM32F1)
 #include "BoardConfig_STM.h"
 #endif
@@ -24,16 +26,6 @@
 #define SERIAL_BAUD 115200
 #define SERIAL_BUFFER_LEN 100
 
-// MPPT MODULE
-#define MPPT_IIN_PIN    6
-#define MPPT_IIN_GAIN   6
-#define MPPT_VIN_PIN    6
-#define MPPT_VIN_GAIN   6
-
-#define MPPT_IOUT_PIN    6
-#define MPPT_IOUT_GAIN   6
-#define MPPT_VOUT_PIN    6
-#define MPPT_VOUT_GAIN   6
 
 // SD Card
 
@@ -41,6 +33,7 @@
 #define SD_FILE_TYPE "csv"
 
 
+// MPPT MODULE
 #define MPPT_DEVICES 6
 #define MPPT_ADDRESS_START 64
 #define MPPT_VIN_GAIN  4.0f

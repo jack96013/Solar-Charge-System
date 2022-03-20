@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2022-03-05 13:44:06
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-03-05 17:04:04
+ * @LastEditTime: 2022-03-20 14:41:08
  * @Description: 
  */
 
@@ -19,9 +19,6 @@
 #define OLED_RESET_PIN  3
 #define OLED_DC_PIN     4
 #define OLED_CS_PIN     5
-
-
-
 
 class OLED
 {
