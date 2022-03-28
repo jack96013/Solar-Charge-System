@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2022-02-25 01:15:16
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-03-15 17:31:24
+ * @LastEditTime: 2022-03-26 20:30:06
  * @Description: 
  */
 #ifndef __DATALOGGER_H__
@@ -15,9 +15,9 @@
 #include "MPPTModule/MPPTModule.h"
 extern MainPowerMonitor mainPowerMonitor;
 extern MPPTModule mpptModule;
+#include "SDCardHelper.h"
 
 #ifdef MODULE_SD_EN
-#include "SDCardHelper.h"
 extern SDCardHelper sdCardHelper;
 #endif
 

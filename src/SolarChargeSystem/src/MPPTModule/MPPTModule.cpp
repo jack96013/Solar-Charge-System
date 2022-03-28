@@ -55,15 +55,15 @@ void MPPTModule::getAdcCallback(SoftTimer &timer,void *arg)
     float val4 = _this->module1.readVoltage(_this->configuration);
     float voltage4 = val4 * MPPT_VOUT_GAIN;
 
-    Serial.print(F("ADS1 Ii :"));
-    Serial.print(current1,4);
-    Serial.print(F("\tVi :"));
-    Serial.print(voltage2,4);
-    Serial.print(F("\tIo :"));
-    Serial.print(current3,4);
-    Serial.print(F("\tVo :"));
-    Serial.print(voltage4,4);
-    Serial.println();
+    // Serial.print(F("ADS1 Ii :"));
+    // Serial.print(current1,4);
+    // Serial.print(F("\tVi :"));
+    // Serial.print(voltage2,4);
+    // Serial.print(F("\tIo :"));
+    // Serial.print(current3,4);
+    // Serial.print(F("\tVo :"));
+    // Serial.print(voltage4,4);
+    // Serial.println();
     
     _this->valTemp[0] = voltage2;
     _this->valTemp[1] = current1;
@@ -84,15 +84,15 @@ void MPPTModule::getAdcCallback(SoftTimer &timer,void *arg)
     val4 = _this->module2.readVoltage(_this->configuration);
     voltage4 = val4 * MPPT_VOUT_GAIN;
 
-    Serial.print(F("ADS2 Ii :"));
-    Serial.print(current1,4);
-    Serial.print(F("\tVi :"));
-    Serial.print(voltage2,4);
-    Serial.print(F("\tIo :"));
-    Serial.print(current3,4);
-    Serial.print(F("\tVo :"));
-    Serial.print(voltage4,4);
-    Serial.println();
+    // Serial.print(F("ADS2 Ii :"));
+    // Serial.print(current1,4);
+    // Serial.print(F("\tVi :"));
+    // Serial.print(voltage2,4);
+    // Serial.print(F("\tIo :"));
+    // Serial.print(current3,4);
+    // Serial.print(F("\tVo :"));
+    // Serial.print(voltage4,4);
+    // Serial.println();
     
     _this->valTemp2[0] = voltage2;
     _this->valTemp2[1] = current1;

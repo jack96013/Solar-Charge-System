@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2022-03-04 22:54:11
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-03-15 00:51:27
+ * @LastEditTime: 2022-03-27 20:30:12
  * @Description: 
  */
 
@@ -11,7 +11,7 @@
 
 // Module Enable
 //#define MODULE_BMS_EN
-#define MODULE_SD_EN
+// #define MODULE_SD_EN
 
 // LTE 
 #define LTE_SERIAL AltSoftSerial
@@ -36,3 +36,7 @@
 // MPPT MODULE
 #define MPPT_I2C
 
+// OLED
+#define OLED_RESET_PIN  3
+#define OLED_DC_PIN     4
+#define OLED_CS_PIN     5

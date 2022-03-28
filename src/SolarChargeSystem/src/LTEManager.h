@@ -1,3 +1,10 @@
+/*
+ * @Author: TZU-CHIEH,HSU
+ * @Date: 2021-12-05 13:31:46
+ * @LastEditors: TZU-CHIEH,HSU
+ * @LastEditTime: 2022-03-28 00:19:23
+ * @Description: 
+ */
 #ifndef __LTEMANAGER_H__
 #define __LTEMANAGER_H__
 
@@ -38,7 +45,14 @@ class LTEManager
         SetNetworkTypeWait,
         RegisterNetwork,
         RegisterNetworkWait,
-        
+        CheckAppNetwork,
+        CheckAppNetworkWait,
+        EnableAppNetwork,
+        EnableAppNetworkWait,
+        SetMqttParameter,
+        SetMqttParameterWait,
+        MqttConnect,
+        MqttConnectWait,
         UNKNOWN,
         
     };

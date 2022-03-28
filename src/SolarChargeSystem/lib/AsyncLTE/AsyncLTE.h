@@ -86,17 +86,29 @@ public:
     //AsyncLTEState setPreferredMode(uint8_t mode);
     AsyncLTEState setPreferredLTEMode(uint8_t mode);
     AsyncLTEState setNetworkSettings(const __FlashStringHelper* apn, const __FlashStringHelper* username=0, const __FlashStringHelper* password=0);
+    
+    AsyncLTEState queryAppNetworkEnable();
+    AsyncLTEState queryAppNetworkIP();
+    int8_t getAppNetworkIP(char* IP,size_t length);
+
+    AsyncLTEState enableAppNetwork(char* APN=NULL);
+    
+
+
     uint8_t getNetworkStatus();
+    AsyncLTEState enableAppNetwork();
+
     
 
     // IMEI
     uint8_t getIMEI(char *imei);
 
     // MQTT
-    bool MQTT_connect();
+    AsyncLTEState MQTT_connect();
     bool MQTT_requestConnectionStatus();
-    bool MQTT_setParameter();
-    bool MQTT_publish();
+    AsyncLTEState MQTT_setParameter(char* URL,int16_t port=1883,char* username="",char* password="",int16_t keeptime=60);
+    AsyncLTEState MQTT_publish();
+
     bool MQTT_subscribe();
 
     
@@ -155,6 +167,14 @@ private:
 
     Result result;
 
+
+    // typedef struct mqttConfigStruct {
+    //     char ip[17];
+    //     int16_t port;
+    //     int16_t keepTime;
+    //     char
+
+    // } MQTTConfig
 };
 
 

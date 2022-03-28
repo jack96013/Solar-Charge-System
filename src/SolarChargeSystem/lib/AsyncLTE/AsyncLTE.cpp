@@ -182,6 +182,82 @@ AsyncLTEState AsyncLTE::setNetworkSettings(const __FlashStringHelper* apn, const
     return AsyncLTEState::SUCCESSFUL;
 }
 
+AsyncLTEState AsyncLTE::queryAppNetworkIP()
+{
+    //     [21:49:45.154]楷↙⊙AT+CNACT?
+    // ↓
+    // [21:49:45.158]彶↘↑AT+CNACT?
+    // +CNACT: 1,"10.161.254.177"
+
+    // OK
+
+    return sendGeneralCommand("CNACT?",2000);
+}
+
+int8_t AsyncLTE::getAppNetworkIP(char* IP,size_t length)
+{
+    if (!serialReceiver.isOK())
+        return -1;
+    
+    const char* result = serialReceiver.getBuffer()->c_str();
+    int8_t result_len = strlen(result);
+    int active = result[8] - 48;
+    if (active != 1)
+        return -1;
+    int startIndex = 11;
+    int len = result_len-startIndex-1;
+    memcpy( IP, &result[startIndex], len);
+    IP[len] = '\0';
+    return 1;
+}
+
+AsyncLTEState AsyncLTE::enableAppNetwork(char* APN)
+{
+    char command[30];
+    sprintf(command, "CNACT=1,\"%s\"", APN);
+    Serial.println(command);
+
+    return sendGeneralCommand(command,2000);
+
+}
+
+AsyncLTEState AsyncLTE::MQTT_connect()
+{
+    return sendGeneralCommand("SMCONN",5000);
+}
+
+AsyncLTEState AsyncLTE::MQTT_setParameter(char* URL,int16_t port,char* username,char* password,int16_t keeptime)
+{
+    if (isBusy())
+        return AsyncLTEState::BUSY;
+    // strcat(command,"\"URL\"=\"");
+    // strcat(command,URL);
+    // strcat(command,"\",");
+    char command[50];
+    sprintf(command,"AT+SMCONF=\"URL\",\"%s\",%d;",URL,port);
+    serial->print(command);
+
+    sprintf(command,"+SMCONF=\"USERNAME\",\"%s\";",username);
+    serial->print(command);
+    
+    sprintf(command,"+SMCONF=\"PASSWORD\",\"%s\";",password);
+    serial->print(command);
+
+    sprintf(command,"+SMCONF=\"KEEPTIME\",\"%d\"",keeptime);
+    serial->println(command);
+    
+
+    serialReceiver.startWaitForResult(100);
+
+
+    return AsyncLTEState::SUCCESSFUL;
+}
+
+AsyncLTEState AsyncLTE::MQTT_publish()
+{
+    
+}
+
 
 void AsyncLTE::onReceiveInvoke(String &data)
 {

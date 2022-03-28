@@ -23,7 +23,7 @@
 #include "ButtonHelper.h"
 
 SerialManager serialManager; // Serial 相關
-// LTEManager lte(serialManager);
+LTEManager lte(serialManager);
 DataLogger dataLogger;
 MPPTModule mpptModule;
 
@@ -64,7 +64,7 @@ void setup()
     
 
     testModuleBegin();
-    //lte.begin();
+    lte.begin();
     oled.begin();
 
     mainPowerMonitor.begin();
@@ -86,7 +86,7 @@ void loop()
 
     //testMillis = millis();
     serialManager.run();
-    //lte.run();
+    lte.run();
     oled.run();
 
 #ifdef MODULE_BMS_EN
@@ -101,7 +101,7 @@ void loop()
     dtrResetRun();
 
     mainPowerMonitor.run();
-    mpptModule.run();
+    //mpptModule.run();
     // ticks++;
     // if (millis() - pc_millis >= 1000)
     // {

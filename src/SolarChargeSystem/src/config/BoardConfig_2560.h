@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2022-03-04 22:54:11
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-03-20 14:34:51
+ * @LastEditTime: 2022-03-27 20:30:05
  * @Description: 
  */
 
@@ -35,4 +35,10 @@
 
 // MPPT MODULE
 #define MPPT_I2C
+
+// OLED
+#define OLED_RESET_PIN  3
+#define OLED_DC_PIN     4
+#define OLED_CS_PIN     5
+
 

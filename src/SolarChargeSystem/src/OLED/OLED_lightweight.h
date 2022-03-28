@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2022-03-05 00:37:11
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-03-05 15:16:10
+ * @LastEditTime: 2022-03-27 20:29:43
  * @Description: 
  */
 
@@ -10,16 +10,13 @@
 #ifndef __OLED_LIGHTWEIGHT_H__
 #define __OLED_LIGHTWEIGHT_H__
 
-#define OLED_RESET_PIN  3
-#define OLED_DC_PIN     4
-#define OLED_CS_PIN     5
-
 #include <Arduino.h>
 #include "SoftTimer.h"
 #include "MainPowerMonitor.h"
 #include "SSD1306AsciiSpi.h"
 #include "SDCardHelper.h"
 #include "DataLogger.h"
+#include "config/Config.h"
 
 extern MainPowerMonitor mainPowerMonitor;
 extern SDCardHelper sdCardHelper;

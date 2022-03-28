@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2022-03-05 00:37:38
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-03-05 15:16:30
+ * @LastEditTime: 2022-03-26 20:33:00
  * @Description: 
  */
 #include "OLED_lightweight.h"
@@ -61,10 +61,16 @@ void OLED::refreshCallback(SoftTimer &timer, void *arg)
     _this->oled.setCol(10);
     _this->oled.setRow(10);
     _this->oled.print("File : ");
-    if (sdCardHelper.isReady())
-        _this->oled.println(sdCardHelper.getFileName());
-    else
-        _this->oled.println(F("Not Inserted"));
+    #ifdef MODULE_SD_EN
+            if (sdCardHelper.isReady())
+                _this->oled.println(sdCardHelper.getFileName());
+            else
+            _this->oled.println(F("Not Inserted"));
+    #else
+        _this->oled.println(F("Not Support"));
+    #endif
+
+
     _this->oled.setCol(10);
     _this->oled.print(F("Datas: "));
     _this->oled.println(dataLogger.getDataCounts());

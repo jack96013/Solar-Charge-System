@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2022-03-05 13:44:06
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-03-20 14:41:08
+ * @LastEditTime: 2022-03-27 20:31:25
  * @Description: 
  */
 
@@ -32,13 +32,13 @@ class OLED
                                 //     Adafruit_SSD1306(uint8_t w, uint8_t h, SPIClass *spi,
                                 //    int8_t dc_pin, int8_t rst_pin, int8_t cs_pin,
                                 //    uint32_t bitrate)
-        Adafruit_SSD1306 display =  Adafruit_SSD1306((uint8_t)128, (uint8_t)64, &SPI, (int8_t)OLED_DC_PIN,
+        Adafruit_SSD1306 oled =  Adafruit_SSD1306((uint8_t)128, (uint8_t)64, &SPI, (int8_t)OLED_DC_PIN,
                    (int8_t)OLED_RESET_PIN, (int8_t)OLED_CS_PIN);
                   
                    
         uint32_t start;
         // Adafruit_SSD1306 display = Adafruit_SSD1306(OLED_WIDTH, OLED_HEIGHT,
-        // &SPI, OLED_DC_PIN, OLED_RESET_PIN, OLED_CS_PIN);
+        //     &SPI, OLED_DC_PIN, OLED_RESET_PIN, OLED_CS_PIN);
         
         static void refreshCallback(SoftTimer& ,void*);
         SoftTimer timer = SoftTimer(1000,refreshCallback,this,SOFTTIMER_INFINITY);

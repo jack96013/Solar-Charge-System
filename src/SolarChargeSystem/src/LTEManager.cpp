@@ -164,7 +164,7 @@ void LTEManager::moduleSetupLoop()
         if (LTE.isSuccessful())
         {
             Serial.println(F("[LTE] Set Successful"));
-            setupProgress = SetupProgress::RegisterNetwork;
+            setupProgress = SetupProgress::CheckAppNetwork;
         }
         else
         {
@@ -173,30 +173,146 @@ void LTEManager::moduleSetupLoop()
         }
         break;
     }
-    case SetupProgress::RegisterNetwork:
-    {
-        Serial.println(F("[LTE] Register APN"));
-        state = LTE.setNetworkSettings(F("internet.iot"));
+    // case SetupProgress::RegisterNetwork:
+    // {
+    //     Serial.println(F("[LTE] Register APN"));
+    //     state = LTE.setNetworkSettings(F("internet.iot"));
         
-        setupProgress = SetupProgress::RegisterNetworkWait;
+    //     setupProgress = SetupProgress::RegisterNetworkWait;
+    //     disableDelay();
+    //     break;
+    // }
+    // case SetupProgress::RegisterNetworkWait:
+    // {
+    //     if (!LTE.isComplete())
+    //         return;
+    //     if (LTE.isSuccessful())
+    //     {   
+    //         Serial.println(F("[LTE] APN is registed successful"));
+    //         setupProgress = SetupProgress::UNKNOWN;
+    //     }
+    //     else
+    //     {
+    //         setupProgress = SetupProgress::UNKNOWN;
+    //     }
+    //     break;
+    // }
+    case SetupProgress::CheckAppNetwork:
+    {
+        Serial.println(F("[LTE] Query APP IP"));
+        LTE.queryAppNetworkIP();
+        
+        setupProgress = SetupProgress::CheckAppNetworkWait;
         disableDelay();
         break;
     }
-    case SetupProgress::RegisterNetworkWait:
+    case SetupProgress::CheckAppNetworkWait:
     {
         if (!LTE.isComplete())
             return;
         if (LTE.isSuccessful())
         {   
-            Serial.println(F("[LTE] APN is registed successful"));
-            setupProgress = SetupProgress::UNKNOWN;
+            size_t length = 15;
+            char ip[length] = "";
+            int8_t state = LTE.getAppNetworkIP(ip,length);
+            if (state !=-1)
+            {
+                Serial.print(F("[LTE] APP IP : "));
+                Serial.println(ip);
+                setupProgress = SetupProgress::SetMqttParameter;
+                
+                break;
+            }
+            Serial.println(F("[LTE] APP Network Deactive"));
+            setupProgress = SetupProgress::EnableAppNetwork;
+            break;
         }
         else
         {
-            setupProgress = SetupProgress::UNKNOWN;
+            setupProgress = SetupProgress::CheckAppNetwork;
+            delayTimer.delay(2000); // 延遲一秒後重新 Check
         }
         break;
     }
+    case SetupProgress::EnableAppNetwork:
+    {
+        Serial.println(F("[LTE] Enable APP Network"));
+        LTE.enableAppNetwork("internet.iot");
+        
+        setupProgress = SetupProgress::EnableAppNetworkWait;
+        disableDelay();
+        break;
+    }
+    case SetupProgress::EnableAppNetworkWait:
+    {
+        if (!LTE.isComplete())
+            return;
+        if (LTE.isSuccessful())
+        {   
+            Serial.println(F("[LTE] Operation Successful"));
+            setupProgress = SetupProgress::CheckAppNetwork; // 重新檢查狀態
+            delayTimer.delay(500); // 延遲一秒後重新 Check
+
+        }
+        else
+        {
+            setupProgress = SetupProgress::EnableAppNetwork;
+            delayTimer.delay(2000); // 延遲一秒後重新 Check
+        }
+        break;
+    }
+    case SetupProgress::SetMqttParameter:
+    {
+        Serial.println(F("[LTE] Set MQTT Parameter"));
+        LTE.MQTT_setParameter("180.218.108.9");
+        setupProgress = SetupProgress::SetMqttParameterWait;
+        disableDelay();
+        break;
+    }
+    case SetupProgress::SetMqttParameterWait:
+    {
+        if (!LTE.isComplete())
+            return;
+        if (LTE.isSuccessful())
+        {   
+            Serial.println(F("[LTE] Operation Successful"));
+            setupProgress = SetupProgress::MqttConnect; // 重新檢查狀態
+            // delayTimer.delay(500); // 延遲一秒後重新 Check
+
+        }
+        else
+        {
+            setupProgress = SetupProgress::EnableAppNetwork;
+            delayTimer.delay(2000); // 延遲一秒後重新 Check
+        }
+        break;
+    }
+    case SetupProgress::MqttConnect:
+    {
+        Serial.println(F("[LTE] Connect to MQTT..."));
+        LTE.MQTT_connect();
+        setupProgress = SetupProgress::MqttConnectWait;
+        disableDelay();
+        break;
+    }
+    case SetupProgress::MqttConnectWait:
+    {
+        if (!LTE.isComplete())
+            return;
+        if (LTE.isSuccessful())
+        {   
+            Serial.println(F("[LTE] Connect Successful"));
+            setupProgress = SetupProgress::UNKNOWN; // 重新檢查狀態
+            // delayTimer.delay(500); // 延遲一秒後重新 Check
+        }
+        else
+        {
+            setupProgress = SetupProgress::MqttConnect;
+            delayTimer.delay(2000); // 延遲一秒後重新 Check
+        }
+        break;
+    }
+    
     case SetupProgress::UNKNOWN:
         delayTimer.stop();
         break;
