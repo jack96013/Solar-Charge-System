@@ -70,34 +70,34 @@ void MPPTModule::getAdcCallback(SoftTimer &timer,void *arg)
     _this->valTemp[2] = voltage4;
     _this->valTemp[3] = current3;
 
-    _this->configuration.mux = ADS1119MuxConfiguration::positiveAIN0negativeAGND;
-    val1 = _this->module2.readVoltage(_this->configuration);
-    current1 = (val1 * MPPT_I_GAIN_DIV - _this->module2_zco[0]) * MPPT_I_GAIN_SEN;
-    _this->configuration.mux = ADS1119MuxConfiguration::positiveAIN1negativeGND;
-    val2 = _this->module2.readVoltage(_this->configuration);
-    voltage2 = val2 * MPPT_VIN_GAIN;
+    // _this->configuration.mux = ADS1119MuxConfiguration::positiveAIN0negativeAGND;
+    // val1 = _this->module2.readVoltage(_this->configuration);
+    // current1 = (val1 * MPPT_I_GAIN_DIV - _this->module2_zco[0]) * MPPT_I_GAIN_SEN;
+    // _this->configuration.mux = ADS1119MuxConfiguration::positiveAIN1negativeGND;
+    // val2 = _this->module2.readVoltage(_this->configuration);
+    // voltage2 = val2 * MPPT_VIN_GAIN;
 
-    _this->configuration.mux = ADS1119MuxConfiguration::positiveAIN3negativeAGND;
-    val3 = _this->module2.readVoltage(_this->configuration);
-    current3 = (val3 * MPPT_I_GAIN_DIV - _this->module2_zco[1]) * MPPT_I_GAIN_SEN;
-    _this->configuration.mux = ADS1119MuxConfiguration::positiveAIN2negativeAGND;
-    val4 = _this->module2.readVoltage(_this->configuration);
-    voltage4 = val4 * MPPT_VOUT_GAIN;
+    // _this->configuration.mux = ADS1119MuxConfiguration::positiveAIN3negativeAGND;
+    // val3 = _this->module2.readVoltage(_this->configuration);
+    // current3 = (val3 * MPPT_I_GAIN_DIV - _this->module2_zco[1]) * MPPT_I_GAIN_SEN;
+    // _this->configuration.mux = ADS1119MuxConfiguration::positiveAIN2negativeAGND;
+    // val4 = _this->module2.readVoltage(_this->configuration);
+    // voltage4 = val4 * MPPT_VOUT_GAIN;
 
-    Serial.print(F("ADS2 Ii :"));
-    Serial.print(current1,4);
-    Serial.print(F("\tVi :"));
-    Serial.print(voltage2,4);
-    Serial.print(F("\tIo :"));
-    Serial.print(current3,4);
-    Serial.print(F("\tVo :"));
-    Serial.print(voltage4,4);
-    Serial.println();
+    // Serial.print(F("ADS2 Ii :"));
+    // Serial.print(current1,4);
+    // Serial.print(F("\tVi :"));
+    // Serial.print(voltage2,4);
+    // Serial.print(F("\tIo :"));
+    // Serial.print(current3,4);
+    // Serial.print(F("\tVo :"));
+    // Serial.print(voltage4,4);
+    // Serial.println();
     
-    _this->valTemp2[0] = voltage2;
-    _this->valTemp2[1] = current1;
-    _this->valTemp2[2] = voltage4;
-    _this->valTemp2[3] = current3;
+    // _this->valTemp2[0] = voltage2;
+    // _this->valTemp2[1] = current1;
+    // _this->valTemp2[2] = voltage4;
+    // _this->valTemp2[3] = current3;
 
 
     
@@ -134,9 +134,9 @@ void MPPTModule::calibrate()
     configuration.mux = ADS1119MuxConfiguration::positiveAIN3negativeAGND;
     module1_zco[1] = module1.readVoltage(configuration) * MPPT_I_GAIN_DIV;
 
-        configuration.mux = ADS1119MuxConfiguration::positiveAIN0negativeAGND;
-    module2_zco[0] = module2.readVoltage(configuration) * MPPT_I_GAIN_DIV;
+    //     configuration.mux = ADS1119MuxConfiguration::positiveAIN0negativeAGND;
+    // module2_zco[0] = module2.readVoltage(configuration) * MPPT_I_GAIN_DIV;
 
-    configuration.mux = ADS1119MuxConfiguration::positiveAIN3negativeAGND;
-    module2_zco[1] = module2.readVoltage(configuration) * MPPT_I_GAIN_DIV;
+    // configuration.mux = ADS1119MuxConfiguration::positiveAIN3negativeAGND;
+    // module2_zco[1] = module2.readVoltage(configuration) * MPPT_I_GAIN_DIV;
 }
