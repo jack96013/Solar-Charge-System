@@ -33,19 +33,19 @@ void SerialManager::begin()
         
     #endif
     
-    //printInfo(DebugSerial);
+    printInfo(DebugSerial);
     //printInfo(SerialLTE);
 
-    serialReceiver.begin(DebugSerial, SERIAL_BUFFER_LEN);
+    //serialReceiver.begin(DebugSerial, SERIAL_BUFFER_LEN);
     //serialLTEReceiver.begin(SerialLTE, LTE_SERIAL_BUFFER_LEN);
 
-    serialReceiver.setOnReceiveCallback(serialOnReceive, this);
+    //serialReceiver.setOnReceiveCallback(serialOnReceive, this);
     //serialLTEReceiver.setOnReceiveCallback(serialLTEOnReceive, this);
 }
 
 void SerialManager::run()
 {
-    serialReceiver.run();
+    //serialReceiver.run();
     //serialLTEReceiver.run();
 }
 

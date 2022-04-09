@@ -39,25 +39,40 @@ void OLED::run()
 void OLED::showDeviceMenu()
 {
     //Total time elapsed 38ms.
-    // oled.clear();
+    oled.clearDisplay();
+    oled.setCursor(0,0);
+    oled.setTextSize(1);             // Normal 1:1 pixel scale
+    oled.setTextColor(SSD1306_WHITE);        // Draw white text
     // oled.set2X();
     oled.println("ECIE LAB");
     // oled.set1X();
     oled.print("LTE : ");
     oled.println("OFFLINE");
     oled.print("SD  : ");
-    oled.println("OFFLINE");
+    if (sdCardHelper.isReady())
+        oled.println("INSERTED");
+    else
+        oled.println("None");
+    
     oled.print("MPPT  : ");
-    oled.println("(0/6)");
+    //oled.println("(0/6)");
+    oled.println(dataLogger.getDataCounts());
     oled.print("BMS  : ");
-    oled.println("ONLINE");
+        oled.println("Unknown");
+    
     oled.print("Elapsed  : ");
     oled.println(millis()-start);  
+    start = millis();
+    oled.display();
+    
 }
 
 void OLED::refreshCallback(SoftTimer &timer ,void* arg)
 {
     OLED* _this = (OLED*) arg;
+    _this->showDeviceMenu();
+    
+
     //_this->oled.
     // _this->display.clear();
     // _this->display.setCol(10);

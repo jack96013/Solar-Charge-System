@@ -40,7 +40,7 @@ public:
 private:
 
     Stream* SerialLTE; // LTE Module
-    SerialReceiver serialReceiver;
+    //SerialReceiver serialReceiver;
     //SerialReceiver serialLTEReceiver;
     
     #ifdef ARDUINO_ARCH_AVR

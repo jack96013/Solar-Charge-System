@@ -69,7 +69,7 @@ void BatteryBalance::run()
 void BatteryBalance::setupLTC6804()
 {
     quikeval_SPI_connect();
-    spi_enable(SPI_CLOCK_DIV2);
+    spi_enable(SPI_CLOCK_DIV16);
     set_adc(MD_NORMAL, DCP_DISABLED, CELL_CH_ALL, AUX_CH_ALL);
 
 }
@@ -263,8 +263,8 @@ void BatteryBalance::read_voltage(void)
 {
     wakeup_idle();
     LTC6804_adcv();
-    // error = LTC6804_rdcv(0, TOTAL_IC, cell_codes);
-    // print_information ();
+    error = LTC6804_rdcv(0, TOTAL_IC, cell_codes);
+    print_information ();
 }
 void BatteryBalance::write_LTC3300(void)
 {
@@ -291,11 +291,13 @@ void BatteryBalance::polling_read(void)
 {
     if (millis() - checkLastMillis >= checkInterval && millis() - checkLastMillis <= checkInterval2)
     {
+        SPI.setClockDivider(SPI_CLOCK_DIV16);
         // BATTERYBALANCE_PRINTHEAD();
         // Serial.println("A");
         // Serial.println(millis()-checkLastMillis);
         checkLastMillis = millis();
         read_voltage();
+        SPI.setClockDivider(SPI_CLOCK_DIV2);
     }
     else if (millis() - checkLastMillis >= checkInterval2)
     {

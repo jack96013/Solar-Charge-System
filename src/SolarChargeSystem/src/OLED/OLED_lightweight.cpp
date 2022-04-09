@@ -100,19 +100,37 @@ void OLED::refreshCallback(SoftTimer &timer, void *arg)
     _this->oled.print(mpptModule.valTemp[3]);
     _this->oled.println(F("A"));
 
+    // _this->oled.setCol(5);
+    // _this->oled.println(F("MPPT2"));
+    // _this->oled.setCol(5);
+    // _this->oled.print(F("IN  : "));
+    // _this->oled.print(mpptModule.valTemp[0]);
+    // _this->oled.print(F("V / "));
+    // _this->oled.print(mpptModule.valTemp[1]);
+    // _this->oled.println(F("A"));
+    // _this->oled.setCol(5);
+    // _this->oled.print(F("OUT : "));
+    // _this->oled.print(mpptModule.valTemp2[2]);
+    // _this->oled.print(F("V / "));
+    // _this->oled.print(mpptModule.valTemp2[3]);
+    // _this->oled.println(F("A"));
+
+    float value = lightSensor.getValue(0);
     _this->oled.setCol(5);
-    _this->oled.println(F("MPPT2"));
+    _this->oled.println(F("SunLight"));
     _this->oled.setCol(5);
-    _this->oled.print(F("IN  : "));
-    _this->oled.print(mpptModule.valTemp[0]);
-    _this->oled.print(F("V / "));
-    _this->oled.print(mpptModule.valTemp[1]);
-    _this->oled.println(F("A"));
+    _this->oled.print(F("Lum :"));
+    _this->oled.print(value);
+    _this->oled.println(F(" Lux"));
     _this->oled.setCol(5);
-    _this->oled.print(F("OUT : "));
-    _this->oled.print(mpptModule.valTemp[2]);
-    _this->oled.print(F("V / "));
-    _this->oled.print(mpptModule.valTemp[3]);
-    _this->oled.println(F("A"));
+    _this->oled.print(F("IRR : "));
+    _this->oled.print(LightSensor::toWM2(value));
+    _this->oled.println(F(" Wm2"));
+    // _this->oled.print(F("temp : "));
+    // _this->oled.print(lightSensor.getValue(1));
+    // _this->oled.println(F(" C"));
+    // _this->oled.print(F("press : "));
+    // _this->oled.print(lightSensor.getValue(2));
+    // _this->oled.println(F(" Bar"));
     //_this->oled.println(mainPowerMonitor.getCurrentA());
 }

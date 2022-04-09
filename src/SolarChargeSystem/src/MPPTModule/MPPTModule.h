@@ -3,12 +3,15 @@
 #include "ADS1119.h"
 #include "config/Config.h"
 #include "SoftTimer.h"
+#include "I2CManager.h"
 
 #define MPPT_PRINTHEAD()   Serial.print(F("[MPPT]"))
 #define MPPT_PRINT(x)      Serial.print(x)
 #define MPPT_PRINTLN(x)    Serial.println(x)
 #define MPPT_LOG(x)   MPPT_PRINTHEAD(); MPPT_PRINT(x)
 #define MPPT_LOGLN(x)   MPPT_PRINTHEAD(); MPPT_PRINTLN(x)
+
+extern I2CManager i2cManager;
 
 class MPPTModule
 {
@@ -22,6 +25,8 @@ public:
     float valTemp2[4] = {0};
 
 private:
+    uint8_t module1_address = 66;
+
     struct ADS1119Configuration configuration;
     ADS1119* deviceList[MPPT_DEVICES] = {0};
     ADS1119 module1 = ADS1119(byte(66));

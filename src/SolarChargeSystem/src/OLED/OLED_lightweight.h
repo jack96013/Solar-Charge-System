@@ -17,11 +17,12 @@
 #include "SDCardHelper.h"
 #include "DataLogger.h"
 #include "config/Config.h"
+#include "LightSensor.h"
 
 extern MainPowerMonitor mainPowerMonitor;
 extern SDCardHelper sdCardHelper;
 extern DataLogger dataLogger;
-
+extern LightSensor lightSensor;
 class OLED
 {
 

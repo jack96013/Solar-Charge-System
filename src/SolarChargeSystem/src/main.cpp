@@ -9,21 +9,24 @@
  */
 
 #include <Arduino.h>
+#include <SPI.h>
 #include "SerialManager.h"
 #include "BatteryBalance/BatteryBalance.h"
 #include "SoftTimer.h"
 #include "LTEManager.h"
 #include "SDCardHelper.h"
 #include "Wire.h"
-#include "OLED/OLED.h"
+#include "OLED\OLED.h"
 #include "MainPowerMonitor.h"
 #include "usbDtrReset.h"
 #include "DataLogger.h"
 #include "MPPTModule\MPPTModule.h"
 #include "ButtonHelper.h"
+#include "LightSensor.h"
+#include "I2CManager.h"
 
 SerialManager serialManager; // Serial 相關
-LTEManager lte(serialManager);
+
 DataLogger dataLogger;
 MPPTModule mpptModule;
 
@@ -33,6 +36,10 @@ BatteryBalance batteryBalance;
 #ifdef MODULE_SD_EN
 SDCardHelper sdCardHelper;
 #endif
+#ifdef MODULE_LTE_EN
+LTEManager lte(serialManager);
+#endif
+
 
 //OLED oled;
 MainPowerMonitor mainPowerMonitor;
@@ -49,30 +56,47 @@ OLED oled;
 
 bool button_last_state = 0;
 
+LightSensor lightSensor;
+
+#ifdef MODULE_I2CM_EN
+I2CManager i2cManager;
+#endif
+
+
 void setup()
 {
 
     serialManager.begin();
 
-#ifdef MODULE_BMS_EN
-    batteryBalance.begin(); // 電池平衡
-#endif
+
 #ifdef MODULE_SD_EN
     sdCardHelper.begin();
 #endif
-    
+#ifdef MODULE_LTE_EN
+    lte.begin();
+#endif
     
 
     testModuleBegin();
-    lte.begin();
+    
     oled.begin();
 
     mainPowerMonitor.begin();
     dataLogger.begin();
 
     mpptModule.begin();
+    lightSensor.begin();
+#ifdef MODULE_I2CM_EN
+    i2cManager.begin();
+
+#endif
+
+    #ifdef MODULE_BMS_EN
+    batteryBalance.begin(); // 電池平衡
+    #endif
 
     pinMode(A3,INPUT_PULLUP);
+
 }
 
 uint32_t ticks = 0;
@@ -86,10 +110,13 @@ void loop()
 
     //testMillis = millis();
     serialManager.run();
-    lte.run();
+    
     oled.run();
-
+#ifdef MODULE_LTE_EN
+    lte.run();
+#endif
 #ifdef MODULE_BMS_EN
+    
     batteryBalance.run(); // 電池平衡
 #endif
 #ifdef MODULE_SD_EN
@@ -100,8 +127,11 @@ void loop()
     testModuleRun();
     dtrResetRun();
 
-    mainPowerMonitor.run();
-    //mpptModule.run();
+    //mainPowerMonitor.run();
+
+
+    mpptModule.run();
+    lightSensor.run();
     // ticks++;
     // if (millis() - pc_millis >= 1000)
     // {

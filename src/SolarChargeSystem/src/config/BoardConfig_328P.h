@@ -11,7 +11,8 @@
 
 // Module Enable
 //#define MODULE_BMS_EN
-// #define MODULE_SD_EN
+#define MODULE_SD_EN
+//#define MODULE_LTE_EN
 
 // LTE 
 #define LTE_SERIAL AltSoftSerial

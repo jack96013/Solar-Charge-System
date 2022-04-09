@@ -16,12 +16,14 @@
 extern MainPowerMonitor mainPowerMonitor;
 extern MPPTModule mpptModule;
 #include "SDCardHelper.h"
+#include "LightSensor.h"
 
 #ifdef MODULE_SD_EN
 extern SDCardHelper sdCardHelper;
 #endif
+extern LightSensor lightSensor;
 
-#define DATALOGGER_SAVE_DIVIDE 10
+#define DATALOGGER_SAVE_DIVIDE 5
 
 class DataLogger
 {

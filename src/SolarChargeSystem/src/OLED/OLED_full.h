@@ -15,6 +15,11 @@
 
 #include <Adafruit_SSD1306.h>
 #include "config/Config.h"
+#include "SDCardHelper.h"
+#include "DataLogger.h"
+
+extern SDCardHelper sdCardHelper;
+extern DataLogger dataLogger;
 
 #define OLED_RESET_PIN  3
 #define OLED_DC_PIN     4
