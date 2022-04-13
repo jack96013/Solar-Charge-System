@@ -37,7 +37,6 @@
 #define MPPT_DEVICES 6
 #define MPPT_ADDRESS_START 64
 #define MPPT_VIN_GAIN  4.0f
-// 
 #define MPPT_VOUT_GAIN 2.20f   //2.204
 #define MPPT_I_GAIN_SEN 2.2222222f    
 #define MPPT_I_GAIN_DIV 1.576f

@@ -14,7 +14,6 @@
 #include "SerialReceiver.h"
 
 
-
 class LTEManager
 {
     public:
@@ -23,6 +22,11 @@ class LTEManager
     void run();
     void moduleSetupLoop();
     void disableDelay();
+    bool isMQTTConnected();
+    AsyncLTE* getLTEInstance();
+    bool isNetworkActive();
+    
+    const char* getIPAddress();
 
     private:
     enum class MainProgress {
@@ -71,6 +75,12 @@ class LTEManager
     static void serialOnReceive(void *arg, String &payload);
 
     SoftTimer delayTimer;
+
+    bool mqtt_connected = false;
+    bool network_active = false;
+
+    char ipAddress[15] = "0.0.0.0";
+    
 
 };
 

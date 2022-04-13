@@ -40,7 +40,9 @@ private:
     SoftTimer getAdcTimer;
     static void getAdcCallback(SoftTimer &timer,void *arg);
     
-    
+    float readVoltage(uint8_t device,uint8_t channel);
+    void saveToTemp(float Vin,float Iin,float Vout,float Iout);
+
 
 };
 

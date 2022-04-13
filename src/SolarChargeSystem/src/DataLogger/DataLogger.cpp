@@ -20,6 +20,10 @@ const char *DataLogger_head = "[SD]";
 
 void DataLogger::begin()
 {
+    #ifdef MODULE_LTE_EN
+        dataLoggerMqtt.begin();
+    #endif
+
     #ifdef MODULE_SD_EN
     if (!sdCardHelper.isReady())
         return;
@@ -28,23 +32,28 @@ void DataLogger::begin()
     file = &sdCardHelper.getFile();
 
     logToFileTimer.setOnExpiredCallback(logToFileCallback, this);
-    logToFileTimer.setInterval(1000);
+    logToFileTimer.setInterval(500);
     logToFileTimer.start();
     
 
     #endif
+
+    
 }
 
 void DataLogger::run()
 {
     logToFileTimer.run();
+    #ifdef MODULE_LTE_EN
+        dataLoggerMqtt.run();
+    #endif
     
 }
 
 void DataLogger::printMainPowerData()
 {
     // Index
-    DATALOGGER_LOGLN(F("Record"));
+    //DATALOGGER_LOGLN(F("Record"));
     
     
     // file->print(dataIndex);

@@ -17,6 +17,7 @@ class I2CManager{
         void run();
         void scanDevices();
         void clearList();
+        uint8_t getDeviceCount();
 
         bool isAvailable(uint8_t address);
     private:

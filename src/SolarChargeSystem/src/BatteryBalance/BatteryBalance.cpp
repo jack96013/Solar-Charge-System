@@ -203,6 +203,12 @@ void BatteryBalance::write_in_3300(void)
         }
     }
 }
+/**
+ * @brief CRC15 Method
+ * @author Orden
+ * @param x 
+ * @return uint8_t 
+ */
 uint8_t BatteryBalance::crc_new_logisim(uint16_t x)
 {
     int crc[12];
@@ -264,7 +270,7 @@ void BatteryBalance::read_voltage(void)
     wakeup_idle();
     LTC6804_adcv();
     error = LTC6804_rdcv(0, TOTAL_IC, cell_codes);
-    print_information ();
+    //print_information ();
 }
 void BatteryBalance::write_LTC3300(void)
 {

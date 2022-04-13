@@ -24,7 +24,7 @@ void AsyncLTESerial::serialCheck()
         
         DEBUG_PRINTSTR(F("Response Timeout!"));
         //timeoutTimer.stop();
-        //setEnable(false);
+        setEnable(false);
         state = AsyncLTESerialState::TIMEOUT;
         return;
     }
@@ -42,6 +42,14 @@ void AsyncLTESerial::serialCheck()
         }
         
         receiveBuffer += (char)incomingByte; // 將字元一個個串接
+        if (incomingByte == '>' && receiveBuffer.length() == 1)
+        {
+            // Wait for Input
+            state = AsyncLTESerialState::OK;
+            receiveFinishFlag = true;
+            lineCount = 0;
+            lastLineIndex = 0;
+        }
 
         if (incomingByte == SM_ENDMARK)
         {
@@ -53,8 +61,8 @@ void AsyncLTESerial::serialCheck()
                 continue;
             }
             
-            //Serial.print("[deb] ");
-            //Serial.println(receiveBuffer);
+            // Serial.print("[deb] ");
+            // Serial.println(receiveBuffer);
 
             // OK\r\n
             size_t current_length = receiveBuffer.length();
@@ -303,7 +311,6 @@ void AsyncLTESerial::startWaitForResult(uint32_t timeout)
     //timeoutTimer.stop();
     
     DEBUG_PRINTSTR(F("Start Wait For Response!"));
-    DEBUG_PRINTSTR(timeoutTimer.isExpired());
 }
 
 AsyncLTESerialState AsyncLTESerial::getState() 

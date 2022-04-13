@@ -16,7 +16,9 @@
 #include <Adafruit_SSD1306.h>
 #include "config/Config.h"
 #include "SDCardHelper.h"
-#include "DataLogger.h"
+#include "DataLogger/DataLogger.h"
+#include <TimeLib.h>
+#include <MemoryUsage.h>
 
 extern SDCardHelper sdCardHelper;
 extern DataLogger dataLogger;
@@ -32,6 +34,8 @@ class OLED
         void begin();
         void run();
         void showDeviceMenu();
+        void showMPPTMenu();
+        void switchPage();
 
     private:
                                 //     Adafruit_SSD1306(uint8_t w, uint8_t h, SPIClass *spi,
@@ -47,6 +51,14 @@ class OLED
         
         static void refreshCallback(SoftTimer& ,void*);
         SoftTimer timer = SoftTimer(1000,refreshCallback,this,SOFTTIMER_INFINITY);
+        
+        enum Page
+        {
+            OLED_Page_Main,
+            OLED_Page_MPPT
+        };
+        
+        Page page = OLED_Page_Main;
 };
 
 #endif // __OLED_FULL_H__

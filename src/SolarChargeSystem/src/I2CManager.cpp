@@ -43,3 +43,8 @@ bool I2CManager::isAvailable(uint8_t address)
     }
     return false;
 }
+
+uint8_t I2CManager::getDeviceCount()
+{
+    return deviceCount;
+}

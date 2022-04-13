@@ -212,15 +212,13 @@ void LTEManager::moduleSetupLoop()
             return;
         if (LTE.isSuccessful())
         {   
-            size_t length = 15;
-            char ip[length] = "";
-            int8_t state = LTE.getAppNetworkIP(ip,length);
+            int8_t state = LTE.getAppNetworkIP(ipAddress,15);
             if (state !=-1)
             {
                 Serial.print(F("[LTE] APP IP : "));
-                Serial.println(ip);
+                Serial.println(ipAddress);
                 setupProgress = SetupProgress::SetMqttParameter;
-                
+                network_active = true;
                 break;
             }
             Serial.println(F("[LTE] APP Network Deactive"));
@@ -278,7 +276,7 @@ void LTEManager::moduleSetupLoop()
             Serial.println(F("[LTE] Operation Successful"));
             setupProgress = SetupProgress::MqttConnect; // 重新檢查狀態
             // delayTimer.delay(500); // 延遲一秒後重新 Check
-
+            
         }
         else
         {
@@ -304,6 +302,7 @@ void LTEManager::moduleSetupLoop()
             Serial.println(F("[LTE] Connect Successful"));
             setupProgress = SetupProgress::UNKNOWN; // 重新檢查狀態
             // delayTimer.delay(500); // 延遲一秒後重新 Check
+            mqtt_connected = true;
         }
         else
         {
@@ -323,6 +322,7 @@ void LTEManager::moduleSetupLoop()
     }
 }
 
+// The Serial for LTE callback function.
 void LTEManager::serialOnReceive(void *arg, String &payload)
 {
     LTEManager &_this = *(LTEManager *)arg;
@@ -340,3 +340,23 @@ void LTEManager::disableDelay()
     delayTimer.setInterval(0);
     delayTimer.start();
 }
+
+bool LTEManager::isMQTTConnected()
+{
+    return mqtt_connected;
+}
+
+bool LTEManager::isNetworkActive()
+{
+    return network_active;
+}
+AsyncLTE* LTEManager::getLTEInstance()
+{
+    return &LTE;
+}
+
+const char* LTEManager::getIPAddress()
+{
+    return ipAddress;
+}
+

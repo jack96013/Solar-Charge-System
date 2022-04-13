@@ -13,17 +13,22 @@
 #include "config/Config.h"
 #include "MainPowerMonitor.h"
 #include "MPPTModule/MPPTModule.h"
-extern MainPowerMonitor mainPowerMonitor;
-extern MPPTModule mpptModule;
 #include "SDCardHelper.h"
 #include "LightSensor.h"
+#include "DataLogger/DataLoggerMqtt.h"
+
+
+extern MainPowerMonitor mainPowerMonitor;
+extern MPPTModule mpptModule;
 
 #ifdef MODULE_SD_EN
 extern SDCardHelper sdCardHelper;
 #endif
 extern LightSensor lightSensor;
 
-#define DATALOGGER_SAVE_DIVIDE 5
+
+
+#define DATALOGGER_SAVE_DIVIDE 10
 
 class DataLogger
 {
@@ -40,6 +45,9 @@ private:
     uint32_t dataIndex = 0;
     uint16_t saveDivideCount = 0;
     
+    #ifdef MODULE_LTE_EN
+        DataLoggerMQTT dataLoggerMqtt;
+    #endif
 };
 
 #endif

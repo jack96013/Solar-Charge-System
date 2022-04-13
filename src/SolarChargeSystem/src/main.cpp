@@ -19,7 +19,7 @@
 #include "OLED\OLED.h"
 #include "MainPowerMonitor.h"
 #include "usbDtrReset.h"
-#include "DataLogger.h"
+#include "DataLogger\DataLogger.h"
 #include "MPPTModule\MPPTModule.h"
 #include "ButtonHelper.h"
 #include "LightSensor.h"
@@ -37,9 +37,8 @@ BatteryBalance batteryBalance;
 SDCardHelper sdCardHelper;
 #endif
 #ifdef MODULE_LTE_EN
-LTEManager lte(serialManager);
+LTEManager lteManager(serialManager);
 #endif
-
 
 //OLED oled;
 MainPowerMonitor mainPowerMonitor;
@@ -62,23 +61,22 @@ LightSensor lightSensor;
 I2CManager i2cManager;
 #endif
 
+ButtonHelper button1;
 
 void setup()
 {
 
     serialManager.begin();
 
-
 #ifdef MODULE_SD_EN
     sdCardHelper.begin();
 #endif
 #ifdef MODULE_LTE_EN
-    lte.begin();
+    lteManager.begin();
 #endif
-    
 
     testModuleBegin();
-    
+
     oled.begin();
 
     mainPowerMonitor.begin();
@@ -88,15 +86,14 @@ void setup()
     lightSensor.begin();
 #ifdef MODULE_I2CM_EN
     i2cManager.begin();
-
 #endif
 
-    #ifdef MODULE_BMS_EN
+#ifdef MODULE_BMS_EN
     batteryBalance.begin(); // 電池平衡
-    #endif
+#endif
 
-    pinMode(A3,INPUT_PULLUP);
-
+    // pinMode(A3, INPUT_PULLUP);
+    button1.begin(A3,BUTTON_INPUT_PULLUP);
 }
 
 uint32_t ticks = 0;
@@ -110,14 +107,14 @@ void loop()
 
     //testMillis = millis();
     serialManager.run();
-    
+
     oled.run();
 #ifdef MODULE_LTE_EN
-    lte.run();
+    lteManager.run();
 #endif
 #ifdef MODULE_BMS_EN
-    
-    batteryBalance.run(); // 電池平衡
+
+    //batteryBalance.run(); // 電池平衡
 #endif
 #ifdef MODULE_SD_EN
     sdCardHelper.run();
@@ -125,10 +122,8 @@ void loop()
     dataLogger.run();
 
     testModuleRun();
-    dtrResetRun();
 
     //mainPowerMonitor.run();
-
 
     mpptModule.run();
     lightSensor.run();
@@ -156,12 +151,22 @@ void testModuleBegin()
 
 void testModuleRun()
 {
-    sTimer1.run();
+    //sTimer1.run();
+    button1.check();
+    if (!button1.ready())
+        return;
+    if (button1.isShortPressed())
+        oled.switchPage();
+    else if (button1.isLongPressed())
+    {
+        Serial.println(F("Cali ADC"));
+        mpptModule.calibrate();
+    }
 }
 
 void onExpiredCallback(SoftTimer &timer, void *arg)
 {
-    
+
     bool state = !digitalRead(A3);
     if (state != button_last_state)
     {
@@ -169,9 +174,8 @@ void onExpiredCallback(SoftTimer &timer, void *arg)
         if (state == HIGH)
         {
             Serial.println(F("CALI"));
-            mpptModule.calibrate();
+            oled.switchPage();
+            //mpptModule.calibrate();
         }
     }
-
 }
-

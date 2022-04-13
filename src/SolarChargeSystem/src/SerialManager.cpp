@@ -23,9 +23,13 @@ void SerialManager::begin()
     Serial.begin(115200);
     
 
-    #if defined(ARDUINO_ARCH_AVR) 
+    #if defined(__AVR_ATmega328P__) 
         softSerial.begin(LTE_SERIAL_BAUD);
         SerialLTE = &softSerial;
+        //__AVR_ATmega2560__
+    #elif defined(__AVR_ATmega2560__) 
+        Serial2.begin(LTE_SERIAL_BAUD);
+        SerialLTE = &Serial2;
     #elif defined(ARDUINO_ARCH_STM32F1)
         Serial1.begin(115200);
         Serial2.begin(LTE_SERIAL_BAUD);

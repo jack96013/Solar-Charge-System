@@ -1,3 +1,10 @@
+/*
+ * @Author: TZU-CHIEH,HSU
+ * @Date: 2022-04-09 06:28:59
+ * @LastEditors: TZU-CHIEH,HSU
+ * @LastEditTime: 2022-04-12 06:42:34
+ * @Description: 
+ */
 #include "LightSensor.h"
 
 void LightSensor::begin()
@@ -28,9 +35,9 @@ void LightSensor::getLuxCallback(SoftTimer &timer, void *arg)
     //_this->luxTemp[1] = _this->lightMeter[1].readLightLevel();
     //bool readFinish = _this->lightMeter[0].measurementReady()
     
-    Serial.print(_this->luxTemp[0]);
-    Serial.print(" ");
-    Serial.println(_this->luxTemp[1]);
+    // Serial.print(_this->luxTemp[0]);
+    // Serial.print(" ");
+    // Serial.println(_this->luxTemp[1]);
     //_this->autoAdjust(0);
     //_this->autoAdjust(1);
     // float temperature = _this->bmp.readTemperature();

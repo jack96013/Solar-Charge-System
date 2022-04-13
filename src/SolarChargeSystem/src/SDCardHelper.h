@@ -2,8 +2,8 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2022-02-23 23:37:51
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-03-15 02:32:17
- * @Description: 
+ * @LastEditTime: 2022-04-12 01:49:13
+ * @Description: Manage SD Card and implement sd card detect (with hardware switch)
  */
 #ifndef __SDCARDHELPER_H__
 #define __SDCARDHELPER_H__

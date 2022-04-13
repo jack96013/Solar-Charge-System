@@ -13,6 +13,7 @@
 #define MODULE_BMS_EN
 #define MODULE_SD_EN
 #define MODULE_LTE_EN
+#define MODULE_I2CM_EN
 
 // LTE 
 #define LTE_SERIAL AltSoftSerial

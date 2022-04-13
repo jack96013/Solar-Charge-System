@@ -3,7 +3,7 @@
  * @Date: 2022-02-26 23:38:47
  * @LastEditors: TZU-CHIEH,HSU
  * @LastEditTime: 2022-03-15 01:37:55
- * @Description: 
+ * @Description: Monitor Drone Power Usage with BHT160
  */
 #include "MainPowerMonitor.h"
 

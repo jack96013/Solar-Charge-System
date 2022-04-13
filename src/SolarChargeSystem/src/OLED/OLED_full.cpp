@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2022-03-05 13:44:16
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-03-27 20:33:18
+ * @LastEditTime: 2022-04-12 06:45:28
  * @Description: 
  */
 
@@ -40,38 +40,67 @@ void OLED::showDeviceMenu()
 {
     //Total time elapsed 38ms.
     oled.clearDisplay();
-    oled.setCursor(0,0);
-    oled.setTextSize(1);             // Normal 1:1 pixel scale
-    oled.setTextColor(SSD1306_WHITE);        // Draw white text
+    oled.setCursor(0, 0);
+    oled.setTextSize(1);              // Normal 1:1 pixel scale
+    oled.setTextColor(SSD1306_WHITE); // Draw white text
     // oled.set2X();
     oled.println("ECIE LAB");
     // oled.set1X();
     oled.print("LTE : ");
-    oled.println("OFFLINE");
+#if defined(MODULE_LTE_EN)
+    if (lteManager.isNetworkActive())
+        oled.println(lteManager.getIPAddress());
+    else
+        oled.println(F("Disconnected"));
+#elif
+    oled.println("DISABLE");
+#endif
     oled.print("SD  : ");
     if (sdCardHelper.isReady())
-        oled.println("INSERTED");
+        oled.println(sdCardHelper.getFileName());
     else
         oled.println("None");
-    
+
     oled.print("MPPT  : ");
     //oled.println("(0/6)");
-    oled.println(dataLogger.getDataCounts());
-    oled.print("BMS  : ");
-        oled.println("Unknown");
-    
+    oled.println(i2cManager.getDeviceCount());
+    // oled.print("BMS  : ");
+    //     oled.println("Unknown");
+
     oled.print("Elapsed  : ");
-    oled.println(millis()-start);  
+    //oled.println(millis());
+
+    oled.print(hour());
+
+    oled.print(":");
+    oled.print(minute());
+
+    oled.print(":");
+    oled.println(second());
+
     start = millis();
+
+    int totalRam = (int)RAMEND - (int)&__data_start;
+    oled.print("SRAM :");
+    oled.print(((float)mu_freeRam() / totalRam) * 100);
+    oled.println(" %");
     oled.display();
-    
 }
 
-void OLED::refreshCallback(SoftTimer &timer ,void* arg)
+void OLED::refreshCallback(SoftTimer &timer, void *arg)
 {
-    OLED* _this = (OLED*) arg;
-    _this->showDeviceMenu();
-    
+    OLED *_this = (OLED *)arg;
+    switch (_this->page)
+    {
+    case OLED_Page_Main:
+        _this->showDeviceMenu();
+        break;
+    case OLED_Page_MPPT:
+        _this->showMPPTMenu();
+
+    default:
+        break;
+    }
 
     //_this->oled.
     // _this->display.clear();
@@ -79,4 +108,48 @@ void OLED::refreshCallback(SoftTimer &timer ,void* arg)
     // _this->display.setRow(10);
     // _this->display.print("Elapsed  : ");
     // _this->display.println(mainPowerMonitor.getVoltage());
+}
+
+void OLED::showMPPTMenu()
+{
+    oled.clearDisplay();
+    oled.setCursor(0, 0);
+    oled.setTextSize(1);              // Normal 1:1 pixel scale
+    oled.setTextColor(SSD1306_WHITE); // Draw white text
+
+    oled.println("MPPT STATUS");
+    oled.print("Data : ");
+    oled.println(dataLogger.getDataCounts());
+    //oled.println();
+    oled.print("Vin  : ");
+    oled.print(mpptModule.valTemp[0]);
+    oled.println(" V");
+    oled.print("Iin  : ");
+    oled.print(mpptModule.valTemp[1]);
+    oled.println(" A");
+    oled.print("Vout : ");
+    oled.print(mpptModule.valTemp[2]);
+    oled.println(" V");
+    oled.print("Iout : ");
+    oled.print(mpptModule.valTemp[3]);
+    oled.println(" A");
+
+    oled.print("ILL : ");
+    oled.print(lightSensor.getValue(0));
+    oled.println(" Lux");
+    oled.print("IRR : ");
+    oled.print(lightSensor.getValue(0)*0.0079f);
+    oled.println(" W/M2");
+    
+    oled.display();
+}
+
+void OLED::switchPage()
+{
+    if (page == OLED_Page_MPPT)
+        page = OLED_Page_Main;
+    else
+        page = (Page)(page + 1);
+    timer.reset();
+    timer.forceExpired();
 }
