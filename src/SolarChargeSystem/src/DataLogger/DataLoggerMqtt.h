@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2022-04-10 02:43:44
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-04-12 06:50:39
+ * @LastEditTime: 2022-04-13 21:42:22
  * @Description: 
  */
 #ifndef __DATALOGGERMQTT_H__
@@ -12,14 +12,14 @@
 #include "LTEManager.h"
 #include "SoftTimer.h"
 #include "AsyncLTE.h"
-#include "LightSensor.h"
+#include "EnvSensor.h"
 
 #include "MainPowerMonitor.h"
 #include "MPPTModule/MPPTModule.h"
 
 extern LTEManager lteManager;
 extern MPPTModule mpptModule;
-extern LightSensor lightSensor;
+extern EnvSensor envSensor;
 
 #define DATALOGGERMQTT_MESSAGE_LEN 70
 

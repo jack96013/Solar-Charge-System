@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2022-03-05 13:44:06
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-03-27 20:31:25
+ * @LastEditTime: 2022-04-13 23:03:43
  * @Description: 
  */
 
@@ -36,6 +36,10 @@ class OLED
         void showDeviceMenu();
         void showMPPTMenu();
         void switchPage();
+        
+        // LTE
+        
+        
 
     private:
                                 //     Adafruit_SSD1306(uint8_t w, uint8_t h, SPIClass *spi,
@@ -55,10 +59,13 @@ class OLED
         enum Page
         {
             OLED_Page_Main,
-            OLED_Page_MPPT
+            OLED_Page_MPPT,
+            OLED_Page_Drone,
         };
         
         Page page = OLED_Page_Main;
+
+        void printLTEStatus();
 };
 
 #endif // __OLED_FULL_H__

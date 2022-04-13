@@ -5,7 +5,13 @@
  * @ Modified by	: TZU-CHIEH,HSU
  * @ Create Time	: 2021-12-04 14:57:43
  * @ Modified time	: 2021-12-11 15:54:47
- * @ Description	: Program Entry Point.
+ * @ Description	:   ECIE 110 Project
+ *    
+ *                      Solar Panel and Battery Manage System.
+ *                      Program Entry Point.
+ *                      Use State Machine Method and Event Driven to
+ *                      implement multi tasking.
+ *                      Don't use any delay() function in main loop.
  */
 
 #include <Arduino.h>
@@ -22,7 +28,7 @@
 #include "DataLogger\DataLogger.h"
 #include "MPPTModule\MPPTModule.h"
 #include "ButtonHelper.h"
-#include "LightSensor.h"
+#include "EnvSensor.h"
 #include "I2CManager.h"
 
 SerialManager serialManager; // Serial 相關
@@ -40,7 +46,6 @@ SDCardHelper sdCardHelper;
 LTEManager lteManager(serialManager);
 #endif
 
-//OLED oled;
 MainPowerMonitor mainPowerMonitor;
 
 // 代碼測試用
@@ -55,7 +60,7 @@ OLED oled;
 
 bool button_last_state = 0;
 
-LightSensor lightSensor;
+EnvSensor envSensor;
 
 #ifdef MODULE_I2CM_EN
 I2CManager i2cManager;
@@ -83,7 +88,7 @@ void setup()
     dataLogger.begin();
 
     mpptModule.begin();
-    lightSensor.begin();
+    envSensor.begin();
 #ifdef MODULE_I2CM_EN
     i2cManager.begin();
 #endif
@@ -126,7 +131,7 @@ void loop()
     //mainPowerMonitor.run();
 
     mpptModule.run();
-    lightSensor.run();
+    envSensor.run();
     // ticks++;
     // if (millis() - pc_millis >= 1000)
     // {

@@ -5,9 +5,9 @@
  * @LastEditTime: 2022-04-12 06:42:34
  * @Description: 
  */
-#include "LightSensor.h"
+#include "EnvSensor.h"
 
-void LightSensor::begin()
+void EnvSensor::begin()
 {
     getDataTimer.setOnExpiredCallback(getLuxCallback, this);
     getDataTimer.setInterval(1000);
@@ -23,14 +23,14 @@ void LightSensor::begin()
     ///    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 }
 
-void LightSensor::run()
+void EnvSensor::run()
 {
     getDataTimer.run();
 }
 
-void LightSensor::getLuxCallback(SoftTimer &timer, void *arg)
+void EnvSensor::getLuxCallback(SoftTimer &timer, void *arg)
 {
-    LightSensor *_this = (LightSensor *)arg;
+    EnvSensor *_this = (EnvSensor *)arg;
     _this->luxTemp[0] = _this->lightMeter[0].readLightLevel();
     //_this->luxTemp[1] = _this->lightMeter[1].readLightLevel();
     //bool readFinish = _this->lightMeter[0].measurementReady()
@@ -51,7 +51,7 @@ void LightSensor::getLuxCallback(SoftTimer &timer, void *arg)
     // Serial.println(" Pa");
 }
 
-void LightSensor::autoAdjust(int sensorIndex)
+void EnvSensor::autoAdjust(int sensorIndex)
 {
         if (luxTemp[sensorIndex] > 40000.0)
             lightMeter[sensorIndex].setMTreg(32);
@@ -61,12 +61,12 @@ void LightSensor::autoAdjust(int sensorIndex)
             lightMeter[sensorIndex].setMTreg(138);
 }
 
-float LightSensor::getValue(int index)
+float EnvSensor::getValue(int index)
 {
     return luxTemp[index];
 }
 
-float LightSensor::toWM2(uint16_t lux)
+float EnvSensor::toWM2(uint16_t lux)
 {
     return lux * 126.58;
 }

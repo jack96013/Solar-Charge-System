@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2021-12-04 15:11:45
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-03-20 14:10:16
+ * @LastEditTime: 2022-04-13 22:48:32
  * @Description:  雙平台，Arduino & STM32
  */
 
@@ -49,3 +49,12 @@
 
 // I = (1/GAIN_DIV-ZCO)*GAIN_SEN = 
 
+#define LTE_MQTT_HOST ""
+#define LTE_MQTT_USERNAME ""
+#define LTE_MQTT_PASSWORD ""
+
+#define ENV_BH1750_EN
+#define ENV_BH1750_ADDR
+
+#define ENV_BMP180_EN
+#define ENV_BMP180_ADDR

@@ -1,4 +1,11 @@
 /*
+ * @Author: TZU-CHIEH,HSU
+ * @Date: 2022-03-15 19:14:06
+ * @LastEditors: TZU-CHIEH,HSU
+ * @LastEditTime: 2022-04-13 21:40:14
+ * @Description: 
+ */
+/*
  * @ FileName		:
  * @ Author			: TZU-CHIEH,HSU
  * @ Modified by	: TZU-CHIEH,HSU
@@ -48,7 +55,7 @@ public:
     void clear();
     
 
-    typedef union Data
+    union Data
     {
         int16_t Int;
         int32_t Long;

@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2021-12-04 20:03:28
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-03-05 02:49:28
+ * @LastEditTime: 2022-04-13 23:45:15
  * @Description: 
  */
 /*
@@ -43,7 +43,7 @@ private:
     //SerialReceiver serialReceiver;
     //SerialReceiver serialLTEReceiver;
     
-    #ifdef ARDUINO_ARCH_AVR
+    #ifdef __AVR_ATmega328P__
     AltSoftSerial softSerial;
     #endif
 

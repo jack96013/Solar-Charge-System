@@ -6,7 +6,7 @@ void DataLoggerMQTT::begin()
 {
     publishTimer.setOnExpiredCallback(publishCallback, this);
     publishTimer.setInterval(5000);
-    publishTimer.start();
+    //publishTimer.start();
     LTE = lteManager.getLTEInstance();
 }
 
@@ -29,7 +29,10 @@ void DataLoggerMQTT::publishCallback(SoftTimer &timer, void *arg)
     _this->progressRestart();
     
 }
-
+/**
+ * @brief Publish all data to MQTT Broker
+ * 
+ */
 void DataLoggerMQTT::publish()
 {
     if (progress == DataLoggerMQTTProgress::FINISH)
@@ -94,7 +97,7 @@ void DataLoggerMQTT::publish()
     {
         progress = DataLoggerMQTTProgress::FINISH;
         topic = "MAIN/ILL";
-        dtostrf(lightSensor.getValue(0), 4, 3, str_temp);
+        dtostrf(envSensor.getValue(0), 4, 3, str_temp);
         sprintf(message,"%s",str_temp);
 
         Serial.println(F("Stop to Push all data !"));

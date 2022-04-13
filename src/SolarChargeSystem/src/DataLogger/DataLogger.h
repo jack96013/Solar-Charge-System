@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2022-02-25 01:15:16
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-03-26 20:30:06
+ * @LastEditTime: 2022-04-13 21:41:47
  * @Description: 
  */
 #ifndef __DATALOGGER_H__
@@ -14,7 +14,7 @@
 #include "MainPowerMonitor.h"
 #include "MPPTModule/MPPTModule.h"
 #include "SDCardHelper.h"
-#include "LightSensor.h"
+#include "EnvSensor.h"
 #include "DataLogger/DataLoggerMqtt.h"
 
 
@@ -24,9 +24,7 @@ extern MPPTModule mpptModule;
 #ifdef MODULE_SD_EN
 extern SDCardHelper sdCardHelper;
 #endif
-extern LightSensor lightSensor;
-
-
+extern EnvSensor envSensor;
 
 #define DATALOGGER_SAVE_DIVIDE 10
 

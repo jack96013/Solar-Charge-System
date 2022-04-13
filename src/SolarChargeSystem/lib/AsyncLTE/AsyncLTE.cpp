@@ -4,7 +4,8 @@ AsyncLTE::AsyncLTE()
 {
 }
 
-AsyncLTEResultBase *AsyncLTE::begin(Stream *serial)
+
+void AsyncLTE::begin(Stream* serial, int8_t pwr_pin, int8_t rst_pin)
 {
     this->serial = serial;
 
@@ -14,33 +15,38 @@ AsyncLTEResultBase *AsyncLTE::begin(Stream *serial)
     serialReceiver.begin(*serial, 100);
     serialReceiver.setOnReceiveCallback(serialOnReceive, this);
 
+    if(pwr_pin != -1)
+    {
+        pwr_pin = 9;
+        DEBUG_PRINTLN("PENDING");
+        pinMode(pwr_pin,INPUT);
+        delay(100);
+        pinMode(pwr_pin,OUTPUT);
+        
+        digitalWrite(pwr_pin,LOW);
+        
+        //resultHandler.clear();
+    }
     DEBUG_PRINTLN("Begin");
-    
-    pwr_pin = 8;
-    pinMode(pwr_pin,INPUT);
-    delay(100);
-    pinMode(pwr_pin,OUTPUT);
-    
-    digitalWrite(pwr_pin,LOW);
-    //resultHandler.clear();
 
-    return nullptr;
+    
+    
 }
-
-void AsyncLTE::begin(Stream *, uint8_t pwr_pin, uint8_t rst_pin)
-{
-    pinMode(pwr_pin,OUTPUT);
-    digitalWrite(pwr_pin,HIGH);
-    
-    digitalWrite(pwr_pin,LOW);
-}
-
+/**
+ * @brief Main Loop for LTE
+ * 
+ */
 void AsyncLTE::run()
 {
     serialReceiver.run();
     resultTimeoutGuard.run();
 }
 
+/**
+ * @brief Use AT Command to Check SIM7000.
+ * 
+ * @return AsyncLTEState 
+ */
 AsyncLTEState AsyncLTE::check()
 {
     if (isBusy())
@@ -76,6 +82,11 @@ void AsyncLTE::getBatteryVoltage()
 {
 }
 
+/**
+ * @brief [NON BLOCKING] Request RSSI (Signal Strength)
+ * 
+ * @return AsyncLTEState 
+ */
 AsyncLTEState AsyncLTE::requestRSSI()
 {
     if (isBusy())
@@ -91,6 +102,11 @@ void AsyncLTE::getSIMStatus()
 {
 }
 
+/**
+ * @brief [NON-BLOCKING] Get RSSI after using requestRSSI Function.
+ * 
+ * @return int 
+ */
 int AsyncLTE::getRSSI()
 {
     if (!serialReceiver.isOK())
@@ -139,6 +155,11 @@ bool AsyncLTE::setNetLED(bool onoff, uint8_t mode, uint16_t timer_on, uint16_t t
 {
 }
 
+/**
+ * @brief [NON-BLOCKING] Request SIM Card CCID
+ * 
+ * @return AsyncLTEState 
+ */
 AsyncLTEState AsyncLTE::requestSIMCCID()
 {
     return sendGeneralCommand("CCID");

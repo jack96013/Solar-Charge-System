@@ -14,7 +14,7 @@ void LTEManager::begin()
     serialLTE = serialManager->getSerialLTE();
     //serialLTE->println(F("[LTEM] Begin"));
 
-    LTE.begin(serialLTE);
+    LTE.begin(serialLTE,8);
 
     delayTimer.setInterval(100);
     delayTimer.setRepeats(SOFTTIMER_INFINITY);
@@ -358,5 +358,15 @@ AsyncLTE* LTEManager::getLTEInstance()
 const char* LTEManager::getIPAddress()
 {
     return ipAddress;
+}
+
+LTEManager::SetupProgress LTEManager::getProgress()
+{
+    return setupProgress;
+}
+
+bool LTEManager::isAvailabe()
+{
+    return !(setupProgress != SetupProgress::Check || setupProgress != SetupProgress::CheckWait) ;
 }
 

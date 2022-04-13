@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2022-03-05 13:44:16
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-04-12 06:45:28
+ * @LastEditTime: 2022-04-13 23:32:30
  * @Description: 
  */
 
@@ -46,15 +46,7 @@ void OLED::showDeviceMenu()
     // oled.set2X();
     oled.println("ECIE LAB");
     // oled.set1X();
-    oled.print("LTE : ");
-#if defined(MODULE_LTE_EN)
-    if (lteManager.isNetworkActive())
-        oled.println(lteManager.getIPAddress());
-    else
-        oled.println(F("Disconnected"));
-#elif
-    oled.println("DISABLE");
-#endif
+    printLTEStatus();
     oled.print("SD  : ");
     if (sdCardHelper.isReady())
         oled.println(sdCardHelper.getFileName());
@@ -110,6 +102,23 @@ void OLED::refreshCallback(SoftTimer &timer, void *arg)
     // _this->display.println(mainPowerMonitor.getVoltage());
 }
 
+void OLED::printLTEStatus()
+{
+    oled.print("LTE : ");
+#if defined(MODULE_LTE_EN)
+    if (lteManager.isNetworkActive())
+        oled.println(lteManager.getIPAddress());
+    else if (!lteManager.isAvailabe())
+        oled.println(F("Booting"));
+    else
+        oled.println(F("Setup Network"));
+    
+   
+#elif
+    oled.println("DISABLE")
+#endif
+}
+
 void OLED::showMPPTMenu()
 {
     oled.clearDisplay();
@@ -135,10 +144,10 @@ void OLED::showMPPTMenu()
     oled.println(" A");
 
     oled.print("ILL : ");
-    oled.print(lightSensor.getValue(0));
+    oled.print(envSensor.getValue(0));
     oled.println(" Lux");
     oled.print("IRR : ");
-    oled.print(lightSensor.getValue(0)*0.0079f);
+    oled.print(envSensor.getValue(0)*0.0079f);
     oled.println(" W/M2");
     
     oled.display();

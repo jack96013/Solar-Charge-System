@@ -1,12 +1,19 @@
-#ifndef __LIGHTSENSOR_H__
-#define __LIGHTSENSOR_H__
+/*
+ * @Author: TZU-CHIEH,HSU
+ * @Date: 2022-04-09 06:29:18
+ * @LastEditors: TZU-CHIEH,HSU
+ * @LastEditTime: 2022-04-13 21:32:17
+ * @Description: 
+ */
+#ifndef __ENVSENSOR_H__
+#define __ENVSENSOR_H__
 #include <Arduino.h>
 #include <SoftTimer.h>
 #include "config/Config.h"
 #include "BH1750.h"
 #include "Adafruit_BMP085.h"
 
-class LightSensor
+class EnvSensor
 {
     public:
         void run();

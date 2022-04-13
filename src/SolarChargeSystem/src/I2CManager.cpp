@@ -1,3 +1,10 @@
+/*
+ * @Author: TZU-CHIEH,HSU
+ * @Date: 2022-04-09 13:28:23
+ * @LastEditors: TZU-CHIEH,HSU
+ * @LastEditTime: 2022-04-13 21:31:20
+ * @Description: 
+ */
 #include "I2CManager.h"
 
 void I2CManager::begin()
@@ -16,6 +23,10 @@ void I2CManager::run()
 {
 
 }
+/**
+ * @brief Scan Devices on IIC Bus
+ * 
+ */
 void I2CManager::scanDevices()
 {
     for (uint8_t addr = 1; addr < I2CMANAGER_MAX_ADDR; addr++)
@@ -28,10 +39,22 @@ void I2CManager::scanDevices()
         deviceCount++;
     }
 }
+/**
+ * @brief Clear Device List
+ * 
+ */
 void I2CManager::clearList()
 {
     deviceCount = 0;
 }
+
+/**
+ * @brief Check the device is online (on the list) 
+ * 
+ * @param address 
+ * @return true 
+ * @return false 
+ */
 
 bool I2CManager::isAvailable(uint8_t address)
 {
@@ -44,6 +67,11 @@ bool I2CManager::isAvailable(uint8_t address)
     return false;
 }
 
+/**
+ * @brief Return the number of devices
+ * 
+ * @return uint8_t 
+ */
 uint8_t I2CManager::getDeviceCount()
 {
     return deviceCount;

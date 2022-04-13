@@ -22,7 +22,7 @@
 extern MainPowerMonitor mainPowerMonitor;
 extern SDCardHelper sdCardHelper;
 extern DataLogger dataLogger;
-extern LightSensor lightSensor;
+extern EnvSensor lightSensor;
 class OLED
 {
 

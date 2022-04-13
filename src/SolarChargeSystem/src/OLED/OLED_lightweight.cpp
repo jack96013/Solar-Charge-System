@@ -124,7 +124,7 @@ void OLED::refreshCallback(SoftTimer &timer, void *arg)
     _this->oled.println(F(" Lux"));
     _this->oled.setCol(5);
     _this->oled.print(F("IRR : "));
-    _this->oled.print(LightSensor::toWM2(value));
+    _this->oled.print(EnvSensor::toWM2(value));
     _this->oled.println(F(" Wm2"));
     // _this->oled.print(F("temp : "));
     // _this->oled.print(lightSensor.getValue(1));

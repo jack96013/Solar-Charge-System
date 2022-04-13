@@ -59,8 +59,7 @@ class AsyncLTE
 {
 public:
     AsyncLTE();
-    AsyncLTEResultBase *begin(Stream *);
-    void begin(Stream *, uint8_t pwr_pin, uint8_t rst_pin);
+    void begin(Stream * serial, int8_t pwr_pin = -1, int8_t rst_pin= -1);
     void run();
 
     AsyncLTEState check(); // Check the module is alive;
@@ -130,8 +129,8 @@ public:
     AsyncLTEState sendGeneralCommand(const char *command, uint32_t timeout = 1000);
 
 private:
-    uint8_t pwr_pin;
-    uint8_t rst_pin;
+    // uint8_t pwr_pin;
+    // uint8_t rst_pin;
     uint8_t timeout;
     uint8_t handler_process = 0;
     bool busy = false;
