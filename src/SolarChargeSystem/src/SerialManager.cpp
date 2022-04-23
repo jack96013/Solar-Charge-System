@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2021-12-04 20:03:18
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-03-07 21:23:36
+ * @LastEditTime: 2022-04-23 23:32:42
  * @Description: 
  */
 
@@ -40,7 +40,7 @@ void SerialManager::begin()
     printInfo(DebugSerial);
     //printInfo(SerialLTE);
 
-    //serialReceiver.begin(DebugSerial, SERIAL_BUFFER_LEN);
+    serialReceiver.begin(DebugSerial, SERIAL_BUFFER_LEN);
     //serialLTEReceiver.begin(SerialLTE, LTE_SERIAL_BUFFER_LEN);
 
     //serialReceiver.setOnReceiveCallback(serialOnReceive, this);
@@ -49,7 +49,7 @@ void SerialManager::begin()
 
 void SerialManager::run()
 {
-    //serialReceiver.run();
+    serialReceiver.run();
     //serialLTEReceiver.run();
 }
 
@@ -70,6 +70,11 @@ Stream* SerialManager::getSerialLTE()
     return SerialLTE;
 }
 
+SerialReceiver* SerialManager::getSerialReceiver()
+{
+    return &serialReceiver;
+}
+
 // SerialReceiver* SerialManager::getSerialLTEReceiver() 
 // {
 //     return &serialLTEReceiver;
@@ -77,10 +82,12 @@ Stream* SerialManager::getSerialLTE()
 
 void SerialManager::serialOnReceive(void *arg, String &payload)
 {
-    SerialManager* _this = (SerialManager*)arg;
-    Serial.println("[SEND]");
-    Serial.println(payload);
-    //_this->SerialLTE.println(payload);
+    // SerialManager* _this = (SerialManager*)arg;
+    // Serial.println("[SEND]");
+    // Serial.println(payload);
+    // _this->SerialLTE->println(payload);
+
+    //batteryBalance.serialOnReceive(&batteryBalance,payload);
 }
 
 // void SerialManager::serialLTEOnReceive(void *arg, String &payload)

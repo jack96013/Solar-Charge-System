@@ -5,73 +5,62 @@ BatteryBalance::BatteryBalance()
 {
 }
 
-void BatteryBalance::begin()
+void BatteryBalance::begin(Stream *serial)
 {
-    //LTC6804_initialize(); // Initialize LTC6804 hardware
-    setupLTC6804();
-    init_cfg();           // Initialize the 6804 configuration array to be written
-    init_comm_1();
-    wakeup_sleep();
-    LTC6804_clrcell();
+    // LTC6804_initialize(); // Initialize LTC6804 hardware
+    this->serial = serial;
+    //this->serialManager = serialManager;
+    //serialManager->getSerialReceiver()->setOnReceiveCallback(serialOnReceive, this);
+    applySPISpeed();
+
+    setupLTC6804();    // Initialize 6804
+    init_cfg();        // Initialize the 6804 configuration array to be written
+    init_comm_1();     // Active Balance Config (Maybe?)
+    wakeup_sleep();    // [LIB] PULL UP CS
+    LTC6804_clrcell(); // Clear battery cell voltage.
     LTC6804_clraux();
     // delay(1000);
-    // read_voltage();
-    // delay(1000);
-    // read_voltage();
+    read_voltage();
+    delay(1000);
+    read_voltage();
+    restoreSPISpeed();
 }
 
 void BatteryBalance::run()
 {
     polling_read();
-    // if (Serial.available())
-    // {
-    //     char val = Serial.read();
-    //     switch (val)
-    //     {
-    //     case '1': //中斷3300
-    //         interrupt_LTC3300();
-    //         balance = 4;
-    //         break;
-    //     case '2': //開始
-    //         balance = First_detect_balance;
-    //         break;
-    //     case '3': //讀電池電壓
-    //         // read_voltage();
-    //         break;
-    //     }
-    // }
-    // if (balance == First_detect_balance)
-    // {
-    //     take_a_break_funcion();
-    // }
-    // else if (balance == Start_balance)
-    // {
-    //     for (int i = 0; i < TOTAL_IC; i++)
-    //         for (int j = 0; j < CELL_NUM; j++)
-    //             Serial.print(active_discharge_flag[i][j]);
-    //     Serial.println();
-    //     /* Serial.println(time_counter);
-    //       Serial.println(start_balance);*/
-    //     // Serial.println("執行30秒");
-    //     start_charge_discharge_function();
-    // }
-    // else if (balance == Take_break_balance)
-    // {
-    //     Serial.println("暫停30秒");
-    //     first = 0;
-    //     delay(10);
-    //     time_counter++;
-    //     take_a_break_funcion();
-    //     //***************************
-    // }
+
+    if (balance == Start_balance)
+    {
+        for (int i = 0; i < TOTAL_IC; i++)
+            for (int j = 0; j < CELL_NUM; j++)
+                Serial.print(active_discharge_flag[i][j]);
+        Serial.println();
+        /* Serial.println(time_counter);
+          Serial.println(start_balance);*/
+        Serial.println("Exe 30s");
+        start_charge_discharge_function();
+    }
+    else if (balance == Take_break_balance)
+    {
+        Serial.println("Take break 30s");
+        first = 0;
+        delay(10);
+        time_counter++;
+        take_a_break_funcion();
+        //***************************
+    }
 }
 
+/**
+ * @brief setup LTC6804. Alternative of LTC6804_initialize();
+ * Because the offical setup function including Linduino board config.
+ */
 void BatteryBalance::setupLTC6804()
 {
-    quikeval_SPI_connect();
-    spi_enable(SPI_CLOCK_DIV16);
+    // quikeval_SPI_connect();
+    spi_enable(BMS_SPI_DIVIDE);
     set_adc(MD_NORMAL, DCP_DISABLED, CELL_CH_ALL, AUX_CH_ALL);
-
 }
 
 void BatteryBalance::init_cfg()
@@ -146,38 +135,34 @@ void BatteryBalance::crc(void)
 //*************************判斷主動充放電*********************************
 void BatteryBalance::HIGH_VOLTAGE_VS_LOW_VOLTAGE(void)
 {
-    num_cell = 0.0;
-    all_voltage = 0.0;
-    avage_voltage = 0.0;
-    for (int i = 0; i < TOTAL_IC; i++)
-        for (int j = 0; j < CELL_NUM; j++)
-            active_discharge_flag[i][j] = 0;
-    polling_read();
-    for (int i = 0; i < 1; i++)
+  num_cell = 0.0;
+  all_voltage = 0.0;
+  avage_voltage = 0.0;
+  for (int i = 0; i < TOTAL_IC; i++)
+    for (int j = 0; j < CELL_NUM; j++)
+      active_discharge_flag [i][j] = 0;
+  polling_read();
+  for (int i = 0; i < 1; i++)
+    for (int j = 0; j < 6; j++)
+      if ((float)cell_codes[i][j] * 0.0001 > 2.5 && (float)cell_codes[i][j] * 0.0001 <= 4.3)
+      {
+        all_voltage = all_voltage + (float)cell_codes[i][j] * 0.0001;
+        num_cell++;
+      }
+  avage_voltage = all_voltage / num_cell;
+  polling_read();
+  for (int i = 0; i < 1; i++)
+  {
+    for (int j = 0 ; j < 6; j++)
     {
-        for (int j = 0; j < 6; j++)
-        {
-            if ((float)cell_codes[i][j] * 0.0001 > 3.5 && (float)cell_codes[i][j] * 0.0001 < 4.1)
-            {
-                all_voltage = all_voltage + (float)cell_codes[i][j] * 0.0001;
-                num_cell++;
-            }
-        }
+      if ((float)cell_codes[i][j] * 0.0001 > avage_voltage && ((float)cell_codes[i][j] * 0.0001 <= 4.3))
+        active_discharge_flag [i][j] = 2;
+      else if ((float)cell_codes[i][j] * 0.0001 < avage_voltage && ((float)cell_codes[i][j] * 0.0001 >= 2.5))
+        active_discharge_flag [i][j] = 3;
+      else
+        active_discharge_flag [i][j] = 0;
     }
-    avage_voltage = all_voltage / num_cell;
-    polling_read();
-    for (int i = 0; i < 1; i++)
-    {
-        for (int j = 0; j < 6; j++)
-        {
-            if ((float)cell_codes[i][j] * 0.0001 > avage_voltage && ((float)cell_codes[i][j] * 0.0001 <= 4.1))
-                active_discharge_flag[i][j] = 2;
-            else if ((float)cell_codes[i][j] * 0.0001 < avage_voltage && ((float)cell_codes[i][j] * 0.0001 >= 3.5))
-                active_discharge_flag[i][j] = 3;
-            else
-                active_discharge_flag[i][j] = 0;
-        }
-    }
+  }
 }
 void BatteryBalance::write_in_3300(void)
 {
@@ -206,8 +191,8 @@ void BatteryBalance::write_in_3300(void)
 /**
  * @brief CRC15 Method
  * @author Orden
- * @param x 
- * @return uint8_t 
+ * @param x
+ * @return uint8_t
  */
 uint8_t BatteryBalance::crc_new_logisim(uint16_t x)
 {
@@ -236,24 +221,50 @@ void BatteryBalance::detect_charge_discharge(void)
 //*********************************************************************************************
 void BatteryBalance::start_balance_end_condition(void)
 {
-    if (time_counter >= start_balance) // 30s
+    num_high_cell = 0.0;
+    all_high_voltage = 0.0;
+    avage_high_voltage = 0.0;
+    num_low_cell = 0.0;
+    all_low_voltage = 0.0;
+    avage_low_voltage = 0.0;
+    for (int i = 0; i < 1; i++)
+        for (int j = 0; j < 6; j++)
+        {
+            if (active_discharge_flag[i][j] == 2)
+            {
+                all_high_voltage = all_high_voltage + (float)cell_codes[i][j] * 0.0001;
+                num_high_cell++;
+            }
+            else if (active_discharge_flag[i][j] == 3)
+            {
+                all_low_voltage = all_low_voltage + (float)cell_codes[i][j] * 0.0001;
+                num_low_cell++;
+            }
+        }
+    avage_high_voltage = all_high_voltage / num_high_cell;
+    avage_low_voltage = all_low_voltage / num_low_cell;
+    Serial.print("[BMS] HL: ");
+    Serial.print(avage_high_voltage);
+    Serial.print("/");
+    Serial.print(avage_low_voltage);
+    Serial.println();
+    if ((avage_high_voltage - avage_low_voltage) <= 0.05) // 30s
     {
         interrupt_LTC3300();
-        balance = 1;
+        balance = 3;
         read_count = 0;
-        time_counter = 0;
     }
 }
 /*********************************************************************************************/
-void BatteryBalance::end_condition(void)
+void BatteryBalance::detect_high_low(void)
 {
     for (int i = 0; i < 1; i++)
     {
         for (int j = 0; j < 6; j++)
         {
-            if ((float)cell_codes[i][j] * 0.0001 >= high_vlotage && (float)cell_codes[i][j] * 0.0001 <= 4.1 && (float)cell_codes[i][j] * 0.0001 >= 3.5)
+            if ((float)cell_codes[i][j] * 0.0001 >= high_vlotage && (float)cell_codes[i][j] * 0.0001 <= 4.3 && (float)cell_codes[i][j] * 0.0001 >= 2.5)
                 high_vlotage = (float)cell_codes[i][j] * 0.0001;
-            if ((float)cell_codes[i][j] * 0.0001 <= low_vlotage && (float)cell_codes[i][j] * 0.0001 >= 3.5 && (float)cell_codes[i][j] * 0.0001 <= 4.1)
+            if ((float)cell_codes[i][j] * 0.0001 <= low_vlotage && (float)cell_codes[i][j] * 0.0001 >= 2.5 && (float)cell_codes[i][j] * 0.0001 <= 4.3)
                 low_vlotage = (float)cell_codes[i][j] * 0.0001;
         }
     }
@@ -261,151 +272,166 @@ void BatteryBalance::end_condition(void)
 /******************************印出所有資訊***************************************************/
 void BatteryBalance::print_information(void)
 {
+    Serial.print("[BMS] Volt");
     for (int i = 0; i < TOTAL_IC; i++)
         for (int j = 0; j < CELL_NUM; j++)
+        {
             Serial.print(cell_codes[i][j] * 0.0001, 4);
+            Serial.print(" ");
+        }
+    Serial.println();
 }
 void BatteryBalance::read_voltage(void)
 {
     wakeup_idle();
     LTC6804_adcv();
     error = LTC6804_rdcv(0, TOTAL_IC, cell_codes);
-    //print_information ();
+    print_information();
 }
 void BatteryBalance::write_LTC3300(void)
 {
+    SPI.setClockDivider(SPI_CLOCK_DIV16);
     wakeup_idle();
     tx_comm_1[0] = 0X8A;
     tx_comm_1[1] = 0x98;
     wrcomm_cofig();
+    SPI.setClockDivider(SPI_CLOCK_DIV2);
 }
 void BatteryBalance::excute_LTC3300(void)
 {
+    SPI.setClockDivider(SPI_CLOCK_DIV16);
     wakeup_idle();
     tx_comm_1[0] = 0X8A;
     tx_comm_1[1] = 0xF8;
     wrcomm_cofig();
+    SPI.setClockDivider(SPI_CLOCK_DIV2);
 }
 void BatteryBalance::interrupt_LTC3300(void)
 {
+    SPI.setClockDivider(SPI_CLOCK_DIV16);
     wakeup_idle();
     tx_comm_1[0] = 0X8A;
     tx_comm_1[1] = 0xE8;
     wrcomm_cofig();
+    SPI.setClockDivider(SPI_CLOCK_DIV2);
 }
 void BatteryBalance::polling_read(void)
 {
-    if (millis() - checkLastMillis >= checkInterval && millis() - checkLastMillis <= checkInterval2)
+    
+    if (millis() - checkLastMillis >= checkInterval)
     {
+        
         SPI.setClockDivider(SPI_CLOCK_DIV16);
-        // BATTERYBALANCE_PRINTHEAD();
-        // Serial.println("A");
-        // Serial.println(millis()-checkLastMillis);
         checkLastMillis = millis();
-        read_voltage();
+        read_voltage(); // 讀電池
         SPI.setClockDivider(SPI_CLOCK_DIV2);
     }
-    else if (millis() - checkLastMillis >= checkInterval2)
-    {
-        Serial.println("A");
-        // Serial.println(millis()-checkLastMillis);
-        checkLastMillis = millis();
-        // print_information_temp ();
-    }
-
 }
+
+// 執行充放電
 void BatteryBalance::start_charge_discharge_function(void)
 {
 
-    // polling_read();
-    // if (first == 0)
-    // {
-    //     write_LTC3300();
-    //     delay(50);
-    //     excute_LTC3300();
-    //     delay(50);
-    //     first = 1;
-    // }
-    // else
-    // {
-    //     write_LTC3300();
-    //     delay(50);
-    // }
-    // read_count++;
-    // if (read_count == 5)
-    // {
-    //     read_count = 0;
-    //     for (int i = 0; i < TOTAL_IC; i++)
-    //     {
-    //         for (int j = 0; j < CELL_NUM; j++)
-    //         {
-    //             if ((float)cell_codes[i][j] * 0.0001 > 4.1 || (float)cell_codes[i][j] * 0.0001 < 3.5)
-    //             {
-    //                 active_discharge_flag[i][j] = 0;
-    //                 write_in_3300();
-    //                 tx_comm_1[5] = 0X09;
-    //                 crc();
-    //                 tx_comm_1[5] = (tx_comm_1[5] | (crc_new_logisim(CRC_1)) << 4);
-    //                 write_LTC3300();
-    //                 delay(50);
-    //                 excute_LTC3300();
-    //                 delay(50);
-    //             }
-    //             polling_read();
-    //         }
-    //     }
-    // }
-    // time_counter++;
-    // start_balance_end_condition();
-    // polling_read();
+    polling_read();
+    if (first == 0)
+    {
+        write_LTC3300();
+        delay(50);
+        excute_LTC3300();
+        delay(50);
+        first = 1;
+    }
+    else
+    {
+        write_LTC3300();
+        delay(50);
+    }
+    read_count++;
+    if (read_count == 5)
+    {
+        read_count = 0;
+        for (int i = 0; i < TOTAL_IC; i++)
+        {
+            for (int j = 0; j < CELL_NUM; j++)
+            {
+                if ((float)cell_codes[i][j] * 0.0001 > 4.3 || (float)cell_codes[i][j] * 0.0001 < 2.5)
+                {
+                    active_discharge_flag[i][j] = 0;
+                    write_in_3300();
+                    tx_comm_1[5] = 0X09;
+                    crc();
+                    tx_comm_1[5] = (tx_comm_1[5] | (crc_new_logisim(CRC_1)) << 4);
+                    write_LTC3300();
+                    delay(50);
+                    excute_LTC3300();
+                    delay(50);
+                }
+                polling_read();
+            }
+        }
+    }
+    start_balance_end_condition();
+    polling_read();
 }
+
 void BatteryBalance::take_a_break_funcion(void)
 {
-    polling_read();
-    if (time_counter >= stop_balance || balance == First_detect_balance) // 30s
+    if (balance == Take_break_balance) // 30s
     {
-        time_counter = 0;
-        balance = Start_balance;
-        end_condition();
-        detect_charge_discharge();
-
-        if ((high_vlotage - low_vlotage) >= 0.5)
-        {
-            start_balance = 323; // 120
-            stop_balance = 2200; // 30
-        }
-        else if ((high_vlotage - low_vlotage) < 0.5 && (high_vlotage - low_vlotage) >= 0.4)
-        {
-            start_balance = 270; // 100
-            stop_balance = 2200; // 30
-        }
-        else if ((high_vlotage - low_vlotage) < 0.4 && (high_vlotage - low_vlotage) >= 0.3)
-        {
-            start_balance = 215; // 80
-            stop_balance = 2200; // 30
-        }
-        else if ((high_vlotage - low_vlotage) < 0.3 && (high_vlotage - low_vlotage) >= 0.2)
-        {
-            start_balance = 162; // 60
-            stop_balance = 2200; // 30
-        }
-        else if ((high_vlotage - low_vlotage) < 0.2 && (high_vlotage - low_vlotage) >= 0.1)
-        {
-            start_balance = 108; // 40
-            stop_balance = 2200; // 30
-        }
-        else if ((high_vlotage - low_vlotage) < 0.1 && (high_vlotage - low_vlotage) >= 0.05)
-        {
-            start_balance = 54;  // 20
-            stop_balance = 2200; // 30
-        }
-        else
-        {
-            start_balance = 0;   // 15s
-            stop_balance = 2200; // 30s
-        }
+        for (int i = 0; i < TOTAL_IC; i++)
+            for (int j = 0; j < CELL_NUM; j++)
+            {
+                if ((float)cell_codes[i][j] * 0.0001 >= 3.8)
+                {
+                    balance = Start_balance;
+                    detect_high_low();
+                    detect_charge_discharge();
+                }
+            }
         high_vlotage = 0.0;
         low_vlotage = 5.0;
     }
     polling_read();
+}
+
+void BatteryBalance::serialOnReceive(void *arg, String &payload)
+{
+    if (payload == "stop")
+    {
+        Serial.println("[BMS] stop");
+        //interrupt_LTC3300();
+        //balance = 4;
+        
+    }
+    else if (payload == "start")
+    {
+        Serial.println("[BMS] start");
+        //balance = First_detect_balance;
+    }
+
+    // char val = Serial.read();
+    //      switch (val)
+    //      {
+    //      case '1': //中斷3300
+    //          interrupt_LTC3300();
+    //          balance = 4;
+    //          break;
+    //      case '2': //開始
+    //          balance = First_detect_balance;
+    //          break;
+    //      case '3': //讀電池電壓
+    //          // read_voltage();
+    //          break;
+    //      }
+
+}
+
+void BatteryBalance::applySPISpeed()
+{
+    SPI.setClockDivider(BMS_SPI_DIVIDE);
+}
+
+void BatteryBalance::restoreSPISpeed()
+{
+    SPI.setClockDivider(GLOBAL_SPI_DIVIDE);
 }

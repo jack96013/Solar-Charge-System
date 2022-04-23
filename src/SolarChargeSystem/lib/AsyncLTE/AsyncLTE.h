@@ -112,7 +112,7 @@ public:
     // MQTT
     AsyncLTEState MQTT_connect();
     bool MQTT_requestConnectionStatus();
-    AsyncLTEState MQTT_setParameter(char *URL, int16_t port = 1883, char *username = "", char *password = "", int16_t keeptime = 60);
+    AsyncLTEState MQTT_setParameter(const char *URL, int16_t port = 1883, const char *username = "", const char *password = "", int16_t keeptime = 60);
     AsyncLTEState MQTT_publish(const char *topic, const char *message, uint16_t contentLength, byte QoS, byte retain);
 
     bool MQTT_subscribe();
@@ -172,7 +172,7 @@ private:
 
     Result result;
 
-    char sendBuffer[127];
+    char sendBuffer[400];
 
     // typedef struct mqttConfigStruct {
     //     char ip[17];
@@ -182,6 +182,8 @@ private:
 
     // } MQTTConfig
     MQTTState mqttState = MQTTState::READY;
+
+
 };
 
 #endif // __ASYNCLTE_H__

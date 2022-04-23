@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2022-03-05 13:44:06
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-04-13 23:03:43
+ * @LastEditTime: 2022-04-23 20:28:36
  * @Description: 
  */
 
@@ -12,20 +12,20 @@
 
 #include <Arduino.h>
 #include <SoftTimer.h>
-
 #include <Adafruit_SSD1306.h>
+#include <TimeLib.h>
+#include <MemoryUsage.h>
+#include <ButtonHelper.h>
+
 #include "config/Config.h"
 #include "SDCardHelper.h"
 #include "DataLogger/DataLogger.h"
-#include <TimeLib.h>
-#include <MemoryUsage.h>
+
+
 
 extern SDCardHelper sdCardHelper;
 extern DataLogger dataLogger;
 
-#define OLED_RESET_PIN  3
-#define OLED_DC_PIN     4
-#define OLED_CS_PIN     5
 
 class OLED
 {
@@ -35,16 +35,16 @@ class OLED
         void run();
         void showDeviceMenu();
         void showMPPTMenu();
+        void showEnvMenu();
         void switchPage();
+        void refreshRightNow();
         
         // LTE
         
         
 
     private:
-                                //     Adafruit_SSD1306(uint8_t w, uint8_t h, SPIClass *spi,
-                                //    int8_t dc_pin, int8_t rst_pin, int8_t cs_pin,
-                                //    uint32_t bitrate)
+    
         Adafruit_SSD1306 oled =  Adafruit_SSD1306((uint8_t)128, (uint8_t)64, &SPI, (int8_t)OLED_DC_PIN,
                    (int8_t)OLED_RESET_PIN, (int8_t)OLED_CS_PIN);
                   
@@ -60,12 +60,23 @@ class OLED
         {
             OLED_Page_Main,
             OLED_Page_MPPT,
-            OLED_Page_Drone,
+            OLED_Page_Env,
+            MAX
         };
         
         Page page = OLED_Page_Main;
 
         void printLTEStatus();
+
+        ButtonHelper button1;
+        ButtonHelper button2;
+        
+        void Button1Handle();
+        void Button2Handle();
+        void pageHeader(const char* header);
+        void printHeader(const __FlashStringHelper *ifsh);
+
+        int mpptModuleIndex = 0;
 };
 
 #endif // __OLED_FULL_H__

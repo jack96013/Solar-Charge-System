@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2021-12-04 20:03:28
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-04-13 23:45:15
+ * @LastEditTime: 2022-04-23 23:32:17
  * @Description: 
  */
 /*
@@ -24,6 +24,7 @@
 
 #include "SerialReceiverTemp.h"
 #include <SerialReceiver.h>
+#include "BatteryBalance/BatteryBalance.h"
 #include "config/Config.h"
 
 class SerialManager
@@ -35,12 +36,12 @@ public:
     void run();
     void printInfo(Stream &serial);
     Stream* getSerialLTE();
-    //SerialReceiver* getSerialLTEReceiver();
-
+    SerialReceiver* getSerialReceiver();
+    
 private:
 
     Stream* SerialLTE; // LTE Module
-    //SerialReceiver serialReceiver;
+    SerialReceiver serialReceiver;
     //SerialReceiver serialLTEReceiver;
     
     #ifdef __AVR_ATmega328P__

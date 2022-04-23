@@ -2,24 +2,29 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2022-04-09 06:28:59
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-04-12 06:42:34
- * @Description: 
+ * @LastEditTime: 2022-04-16 09:49:59
+ * @Description:
  */
 #include "EnvSensor.h"
 
 void EnvSensor::begin()
 {
-    getDataTimer.setOnExpiredCallback(getLuxCallback, this);
+    getDataTimer.setOnExpiredCallback(getDataCallback, this);
     getDataTimer.setInterval(1000);
     getDataTimer.start();
+#if defined(ENV_BH1750_EN)
+    lightMeter[0].begin(BH1750::CONTINUOUS_HIGH_RES_MODE, 0x23);
+#endif
+#if defined(ENV_MAX44009_EN)
+    for (int i = 0; i < ENV_LIGHT_MAX_DEVICE; i++)
+    {
+        lightMeter[i].setContinuousMode();
+        lightMeter[i].setAutomaticMode();
+    }
+#endif
+    bmp.begin();
 
-    lightMeter[0].begin(BH1750::CONTINUOUS_HIGH_RES_MODE,0x23);
-    Serial.println("OK");
-    delay(10);
-    //lightMeter[1].begin(BH1750::CONTINUOUS_HIGH_RES_MODE,0x5c);
-    Serial.println("OK");
-
-    //if (!bmp.begin()) 
+    // if (!bmp.begin())
     ///    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 }
 
@@ -28,37 +33,39 @@ void EnvSensor::run()
     getDataTimer.run();
 }
 
-void EnvSensor::getLuxCallback(SoftTimer &timer, void *arg)
+void EnvSensor::getDataCallback(SoftTimer &timer, void *arg)
 {
     EnvSensor *_this = (EnvSensor *)arg;
-    _this->luxTemp[0] = _this->lightMeter[0].readLightLevel();
-    //_this->luxTemp[1] = _this->lightMeter[1].readLightLevel();
-    //bool readFinish = _this->lightMeter[0].measurementReady()
-    
-    // Serial.print(_this->luxTemp[0]);
-    // Serial.print(" ");
-    // Serial.println(_this->luxTemp[1]);
-    //_this->autoAdjust(0);
-    //_this->autoAdjust(1);
-    // float temperature = _this->bmp.readTemperature();
-    // float pressure = _this->bmp.readPressure();
-    // Serial.print("Temperature = ");
-    // Serial.print(temperature);
-    // Serial.println(" *C");
-    
-    // Serial.print("Pressure = ");
-    // Serial.print(pressure);
-    // Serial.println(" Pa");
+    for (int i = 0; i < 1; i++)
+    {
+#ifdef ENV_BH1750_EN
+        _this->luxTemp[i] = _this->lightMeter[i].readLightLevel();
+        _this->autoAdjust(i);
+#endif
+
+#ifdef ENV_MAX44009_EN
+
+        float lux = _this->lightMeter[i].getLux();
+        int err = _this->lightMeter[i].getError();
+        if (err == 0)
+            _this->luxTemp[i] = lux;
+        
+#endif
+    }
+    Serial.println(_this->luxTemp[0]);
+    _this->temperature = _this->bmp.readTemperature();
 }
 
 void EnvSensor::autoAdjust(int sensorIndex)
 {
-        if (luxTemp[sensorIndex] > 40000.0)
-            lightMeter[sensorIndex].setMTreg(32);
-        else if (luxTemp[sensorIndex] > 10.0)
-            lightMeter[sensorIndex].setMTreg(69);
-        else if (luxTemp[sensorIndex] <= 10.0)
-            lightMeter[sensorIndex].setMTreg(138);
+#if defined(ENV_BH1750_EN)
+    if (luxTemp[sensorIndex] > 40000.0)
+        lightMeter[sensorIndex].setMTreg(32);
+    else if (luxTemp[sensorIndex] > 10.0)
+        lightMeter[sensorIndex].setMTreg(69);
+    else if (luxTemp[sensorIndex] <= 10.0)
+        lightMeter[sensorIndex].setMTreg(138);
+#endif
 }
 
 float EnvSensor::getValue(int index)
@@ -66,7 +73,12 @@ float EnvSensor::getValue(int index)
     return luxTemp[index];
 }
 
+float EnvSensor::getTemperature()
+{
+    return temperature;
+}
+
 float EnvSensor::toWM2(uint16_t lux)
 {
-    return lux * 126.58;
+    return lux * 0.0079;
 }

@@ -17,13 +17,13 @@ void AsyncLTE::begin(Stream* serial, int8_t pwr_pin, int8_t rst_pin)
 
     if(pwr_pin != -1)
     {
-        pwr_pin = 9;
         DEBUG_PRINTLN("PENDING");
-        pinMode(pwr_pin,INPUT);
+        pinMode(pwr_pin,OUTPUT);
+        digitalWrite(pwr_pin,LOW);
         delay(100);
         pinMode(pwr_pin,OUTPUT);
         
-        digitalWrite(pwr_pin,LOW);
+        digitalWrite(pwr_pin,HIGH);
         
         //resultHandler.clear();
     }
@@ -246,7 +246,7 @@ AsyncLTEState AsyncLTE::MQTT_connect()
     return sendGeneralCommand("SMCONN", 5000);
 }
 
-AsyncLTEState AsyncLTE::MQTT_setParameter(char *URL, int16_t port, char *username, char *password, int16_t keeptime)
+AsyncLTEState AsyncLTE::MQTT_setParameter(const char *URL, int16_t port, const char *username,const char *password, int16_t keeptime)
 {
     if (isBusy())
         return AsyncLTEState::BUSY;

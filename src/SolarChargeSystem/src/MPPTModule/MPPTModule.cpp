@@ -5,21 +5,49 @@ void MPPTModule::begin()
     configuration.mux = ADS1119MuxConfiguration::positiveAIN0negativeAGND;
     configuration.gain = ADS1119Configuration::Gain::one;
     configuration.dataRate = ADS1119Configuration::DataRate::sps20;
-    configuration.conversionMode = ADS1119Configuration::ConversionMode::continuous;
+    configuration.conversionMode = ADS1119Configuration::ConversionMode::singleShot;
     configuration.voltageReference = ADS1119Configuration::VoltageReferenceSource::internal;
 
-    module1.begin();
-    module1.reset();
+    
+    calibration.gain = ADS1119Configuration::Gain::one;
+    calibration.dataRate = ADS1119Configuration::DataRate::sps20;
+    calibration.conversionMode = ADS1119Configuration::ConversionMode::continuous;
+    calibration.voltageReference = ADS1119Configuration::VoltageReferenceSource::internal;
+
+    adc.begin();
+    for (int i = 0; i < MPPT_DEVICES; i++)
+    {
+        uint8_t addr = address[i];
+        if (i2cManager.isAvailable(addr))
+        {
+            adc.setAddress(addr);
+            adc.reset();
+
+            calibration.mux = ADS1119MuxConfiguration::positiveAIN0negativeAGND; // VREF connected to AIN2 !!!
+            adc.performOffsetCalibration(calibration);
+            calibration.mux = ADS1119MuxConfiguration::positiveAIN1negativeAGND; // VREF connected to AIN2 !!!
+            adc.performOffsetCalibration(calibration);
+            calibration.mux = ADS1119MuxConfiguration::positiveAIN2negativeAGND; // VREF connected to AIN2 !!!
+            adc.performOffsetCalibration(calibration);
+            calibration.mux = ADS1119MuxConfiguration::positiveAIN3negativeAGND; // VREF connected to AIN2 !!!
+            adc.performOffsetCalibration(calibration);
+            adc.writeConfig(configuration);
+        }
+        zeroCurrentVoltage[i][0] = MPPT_I_ZCO;
+        zeroCurrentVoltage[i][1] = MPPT_I_ZCO;
+    }
+
     // module2.begin();
     // module2.reset();
 
     getAdcTimer.setOnExpiredCallback(getAdcCallback, this);
-    getAdcTimer.setInterval(1000);
+    getAdcTimer.setInterval(1000 / 4);
     getAdcTimer.start();
 }
 
 void MPPTModule::run()
 {
+
     getAdcTimer.run();
 }
 
@@ -36,91 +64,73 @@ void MPPTModule::scanDevices()
 
 void MPPTModule::getAdcCallback(SoftTimer &timer, void *arg)
 {
+
     MPPTModule *_this = (MPPTModule *)arg;
-    float volt;
-    float Vin,Iin,Vout,Iout;
 
-    volt = _this->readVoltage(64,0);
-    Iin = (volt * MPPT_I_GAIN_DIV - _this->module1_zco[0]) * MPPT_I_GAIN_SEN;
-    volt = _this->readVoltage(64,1);
-    Vin = volt * MPPT_VIN_GAIN;
-    volt = _this->readVoltage(64,3);
-    Iout = (volt * MPPT_I_GAIN_DIV - _this->module1_zco[1]) * MPPT_I_GAIN_SEN;
-    volt = _this->readVoltage(64,2);
-    Vout = volt * MPPT_VOUT_GAIN;
-    _this->saveToTemp(Vin,Iin,Vout,Iout);
+    for (int index = 0; index < MPPT_DEVICES; index++)
+    {
+        //_this->readMpptModule(i);
+        _this->adc.setAddress(_this->address[index]);
+        float volt = _this->adc.readVoltageDirectly(_this->configuration);
+        float diff;
+        switch (_this->currentChannel)
+        {
 
-    // Serial.print(F("ADS1 Ii :"));
-    // Serial.print(current1,4);
-    // Serial.print(F("\tVi :"));
-    // Serial.print(voltage2,4);
-    // Serial.print(F("\tIo :"));
-    // Serial.print(current3,4);
-    // Serial.print(F("\tVo :"));
-    // Serial.print(voltage4,4);
-    // Serial.println();
+        case MPPT_VIN:
+            _this->valTemp[index][MPPT_VIN_INDEX] = volt * MPPT_VIN_GAIN;
+            break;
+        case MPPT_IIN:
+            diff = volt * MPPT_I_GAIN_DIV - _this->zeroCurrentVoltage[index][0];
+            _this->valTemp[index][MPPT_IIN_INDEX] = diff * MPPT_I_GAIN_SEN;
+            if (_this->onCalibrate)
+                _this->zeroCurrentVoltage[index][0] = volt * MPPT_I_GAIN_DIV;
+            break;
+        case MPPT_IOUT:
 
-    // _this->configuration.mux = ADS1119MuxConfiguration::positiveAIN0negativeAGND;
-    // val1 = _this->module2.readVoltage(_this->configuration);
-    // current1 = (val1 * MPPT_I_GAIN_DIV - _this->module2_zco[0]) * MPPT_I_GAIN_SEN;
-    // _this->configuration.mux = ADS1119MuxConfiguration::positiveAIN1negativeGND;
-    // val2 = _this->module2.readVoltage(_this->configuration);
-    // voltage2 = val2 * MPPT_VIN_GAIN;
+            diff = volt * MPPT_I_GAIN_DIV - _this->zeroCurrentVoltage[index][1];
+            _this->valTemp[index][MPPT_IOUT_INDEX] = diff * MPPT_I_GAIN_SEN;
 
-    // _this->configuration.mux = ADS1119MuxConfiguration::positiveAIN3negativeAGND;
-    // val3 = _this->module2.readVoltage(_this->configuration);
-    // current3 = (val3 * MPPT_I_GAIN_DIV - _this->module2_zco[1]) * MPPT_I_GAIN_SEN;
-    // _this->configuration.mux = ADS1119MuxConfiguration::positiveAIN2negativeAGND;
-    // val4 = _this->module2.readVoltage(_this->configuration);
-    // voltage4 = val4 * MPPT_VOUT_GAIN;
+            if (_this->onCalibrate)
+            {
+                _this->zeroCurrentVoltage[index][1] = volt * MPPT_I_GAIN_DIV;
+                if (index == MPPT_DEVICES - 1)
+                    _this->onCalibrate = false;
+            }
+            break;
+        case MPPT_VOUT:
+            _this->valTemp[index][MPPT_VOUT_INDEX] = volt * MPPT_VOUT_GAIN;
+            break;
+        }
+    }
+    // Switch Channel
+    _this->currentChannel++;
+    if (_this->currentChannel == 4)
+        _this->currentChannel = 0;
+    _this->configuration.mux = (ADS1119MuxConfiguration)(_this->currentChannel + 0b011);
 
-    // Serial.print(F("ADS2 Ii :"));
-    // Serial.print(current1,4);
-    // Serial.print(F("\tVi :"));
-    // Serial.print(voltage2,4);
-    // Serial.print(F("\tIo :"));
-    // Serial.print(current3,4);
-    // Serial.print(F("\tVo :"));
-    // Serial.print(voltage4,4);
-    // Serial.println();
+    for (int i = 0; i < MPPT_DEVICES; i++)
+    {
 
-    // _this->valTemp2[0] = voltage2;
-    // _this->valTemp2[1] = current1;
-    // _this->valTemp2[2] = voltage4;
-    // _this->valTemp2[3] = current3;
-
-    // _this->configuration.mux = ADS1119MuxConfiguration::positiveAIN0negativeAGND;
-    // val1 = _this->module2.readVoltage(_this->configuration);
-    // current1 = (val1 * MPPT_I_GAIN_DIV - 2.52f) * 2.2222f;
-    // _this->configuration.mux = ADS1119MuxConfiguration::positiveAIN1negativeGND;
-    // val2 = _this->module2.readVoltage(_this->configuration);
-    // voltage2 = val2 * MPPT_VIN_GAIN;
-
-    // _this->configuration.mux = ADS1119MuxConfiguration::positiveAIN3negativeAGND;
-    // val3 = _this->module2.readVoltage(_this->configuration);
-    // current3 = (val3 * MPPT_I_GAIN_DIV - 2.52f) * 2.2222f;
-    // _this->configuration.mux = ADS1119MuxConfiguration::positiveAIN2negativeAGND;
-    // val4 = _this->module2.readVoltage(_this->configuration);
-    // voltage4 = val4 * MPPT_VOUT_GAIN;
-
-    // Serial.print(F("ADS2 Ii :"));
-    // Serial.print(current1,4);
-    // Serial.print(F("\tVi :"));
-    // Serial.print(voltage2,4);
-    // Serial.print(F("\tIo :"));
-    // Serial.print(current3,4);
-    // Serial.print(F("\tVo :"));
-    // Serial.print(voltage4,4);
-    // Serial.println();
+        _this->adc.setAddress(_this->address[i]);
+        Serial.println("Start");
+        _this->adc.writeConfig(_this->configuration);
+        Serial.println("End");
+        // delay(10);
+    }
 }
 
 void MPPTModule::calibrate()
 {
-    configuration.mux = ADS1119MuxConfiguration::positiveAIN0negativeAGND;
-    module1_zco[0] = module1.readVoltage(configuration) * MPPT_I_GAIN_DIV;
-
-    configuration.mux = ADS1119MuxConfiguration::positiveAIN3negativeAGND;
-    module1_zco[1] = module1.readVoltage(configuration) * MPPT_I_GAIN_DIV;
+    onCalibrate = true;
+    return;
+    for (int i = 0; i < MPPT_DEVICES; i++)
+    {
+        uint8_t addr = address[i];
+        if (!i2cManager.isAvailable(addr))
+            continue;
+        zeroCurrentVoltage[i][0] = readVoltage(i, 1) * MPPT_I_GAIN_DIV;
+        zeroCurrentVoltage[i][1] = readVoltage(i, 2) * MPPT_I_GAIN_DIV;
+    }
 
     //     configuration.mux = ADS1119MuxConfiguration::positiveAIN0negativeAGND;
     // module2_zco[0] = module2.readVoltage(configuration) * MPPT_I_GAIN_DIV;
@@ -129,19 +139,62 @@ void MPPTModule::calibrate()
     // module2_zco[1] = module2.readVoltage(configuration) * MPPT_I_GAIN_DIV;
 }
 
-float MPPTModule::readVoltage(uint8_t device,uint8_t channel)
+float MPPTModule::readVoltage(uint8_t index, uint8_t channel)
 {
-    if (!i2cManager.isAvailable(device))
+    uint8_t addr = address[index];
+    if (!i2cManager.isAvailable(addr))
         return NAN;
-    //Single Ended Mode
+    adc.setAddress(addr);
+    // Single Ended Mode
     configuration.mux = (ADS1119MuxConfiguration)(channel + 0b011);
-    return module1.readVoltage(configuration);
+    return adc.readVoltage(configuration);
 }
 
-void MPPTModule::saveToTemp(float Vin,float Iin,float Vout,float Iout)
+void MPPTModule::saveToTemp(uint8_t index, float Vin, float Iin, float Vout, float Iout)
 {
-    valTemp[0] = Vin;
-    valTemp[1] = Iin;
-    valTemp[2] = Vout;
-    valTemp[3] = Iout;
+    valTemp[index][MPPT_VIN_INDEX] = Vin;
+    valTemp[index][MPPT_IIN_INDEX] = Iin;
+    valTemp[index][MPPT_VOUT_INDEX] = Vout;
+    valTemp[index][MPPT_IOUT_INDEX] = Iout;
+}
+
+void MPPTModule::readMpptModule(uint8_t index)
+{
+    float volt;
+    float Vin, Iin, Vout, Iout;
+
+    volt = readVoltage(index, MPPT_IIN_INDEX);
+    Iin = (volt * MPPT_I_GAIN_DIV - zeroCurrentVoltage[index][0]) * MPPT_I_GAIN_SEN;
+    volt = readVoltage(index, MPPT_VIN_INDEX);
+    Vin = volt * MPPT_VIN_GAIN;
+    volt = readVoltage(index, MPPT_IOUT_INDEX);
+    Iout = (volt * MPPT_I_GAIN_DIV - zeroCurrentVoltage[index][1]) * MPPT_I_GAIN_SEN;
+    volt = readVoltage(index, MPPT_VOUT_INDEX);
+    Vout = volt * MPPT_VOUT_GAIN;
+    saveToTemp(index, Vin, Iin, Vout, Iout);
+}
+
+float MPPTModule::getInputVoltage(uint8_t index)
+{
+    if (index >= MPPT_DEVICES || !i2cManager.isAvailable(address[index]))
+        return NAN;
+    return valTemp[index][MPPT_VIN_INDEX];
+}
+float MPPTModule::getInputCurrent(uint8_t index)
+{
+    if (index >= MPPT_DEVICES || !i2cManager.isAvailable(address[index]))
+        return NAN;
+    return valTemp[index][MPPT_IIN_INDEX];
+}
+float MPPTModule::getOutputVoltage(uint8_t index)
+{
+    if (index >= MPPT_DEVICES || !i2cManager.isAvailable(address[index]))
+        return NAN;
+    return valTemp[index][MPPT_VOUT_INDEX];
+}
+float MPPTModule::getOutputCurrent(uint8_t index)
+{
+    if (index >= MPPT_DEVICES || !i2cManager.isAvailable(address[index]))
+        return NAN;
+    return valTemp[index][MPPT_IOUT_INDEX];
 }

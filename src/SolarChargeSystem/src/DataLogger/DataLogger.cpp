@@ -2,7 +2,7 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2022-02-25 01:15:29
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-04-13 22:13:48
+ * @LastEditTime: 2022-04-23 17:16:05
  * @Description: 
  */
 #include "DataLogger.h"
@@ -33,7 +33,7 @@ void DataLogger::begin()
 
     logToFileTimer.setOnExpiredCallback(logToFileCallback, this);
     logToFileTimer.setInterval(500);
-    //logToFileTimer.start();
+    logToFileTimer.start();
     
 
     #endif
@@ -67,15 +67,21 @@ void DataLogger::printMainPowerData()
     
     file->print(dataIndex);
     file->print(',');
-    file->print(mpptModule.valTemp[0],4);
-    file->print(',');
-    file->print(mpptModule.valTemp[1],4);
-    file->print(',');
-    file->print(mpptModule.valTemp[2],4);
-    file->print(',');
-    file->print(mpptModule.valTemp[3],4);
-    file->print(',');
+    for (int i=0;i<MPPT_DEVICES;i++)
+    {
+        file->print(mpptModule.getInputVoltage(i) ,3);
+        file->print(',');
+        file->print(mpptModule.getInputCurrent(i),3);
+        file->print(',');
+        file->print(mpptModule.getOutputVoltage(i),3);
+        file->print(',');
+        file->print(mpptModule.getOutputCurrent(i),3);
+        file->print(',');
+    }
+    
     file->print(envSensor.getValue(0),4);
+    file->print(',');
+    file->print(envSensor.getTemperature(),1);
     // file->print(',');
     // file->print(lightSensor.getValue(1),4);
     // file->print(',');

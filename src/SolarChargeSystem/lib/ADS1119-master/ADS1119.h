@@ -56,7 +56,7 @@ enum struct ADS1119MuxConfiguration: uint8_t {
 	positiveAIN2negativeAIN3 = ADS1119_MUX_P_AIN2_N_AIN3, 
 	positiveAIN1negativeAIN2 = ADS1119_MUX_P_AIN1_N_AIN2,
 	positiveAIN0negativeAGND = ADS1119_MUX_P_AIN0_N_AGND, 
-	positiveAIN1negativeGND = ADS1119_MUX_P_AIN1_N_AGND, 
+	positiveAIN1negativeAGND = ADS1119_MUX_P_AIN1_N_AGND, 
 	positiveAIN2negativeAGND = ADS1119_MUX_P_AIN2_N_AGND, 
 	positiveAIN3negativeAGND = ADS1119_MUX_P_AIN3_N_AGND,
 	shortedToHalvedAVDD = ADS1119_MUX_SHORTED_H_AVDD 
@@ -123,6 +123,8 @@ class ADS1119
 public:
 	ADS1119(uint8_t address = ADS1119_DEFAULT_ADDRESS);
 
+	void setAddress(uint8_t address);
+
 	/**
 	Begin using the library instance.
 	*/
@@ -164,6 +166,8 @@ public:
 	This command reads the value of the selected register. 
 	*/
 	uint8_t readRegister(ADS1119RegisterToRead registerToRead);
+	bool writeConfig(ADS1119Configuration config);
+	float readVoltageDirectly(ADS1119Configuration config);
 
 private:
 	TwoWire *_i2c;

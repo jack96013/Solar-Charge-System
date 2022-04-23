@@ -39,6 +39,11 @@ ADS1119::ADS1119(uint8_t address)
     _address = address;
 }
 
+void ADS1119::setAddress(uint8_t address) 
+{
+    _address = address;
+}
+
 void ADS1119::begin(TwoWire *theWire) 
 {
     _i2c = theWire;
@@ -140,7 +145,7 @@ bool ADS1119::commandReadData()
 bool ADS1119::commandStart()
 {
     // 8.5.3.3 START/SYNC (0000 100x) / Page 25
-    // http://www.ti.com/lit/ds/sbas925a/sbas925a.pdf
+    // http://www.ti.com/lit/ds/sbas925a/sbas 925a.pdf
     return writeByte(0B00001000); // 0x08
 }
 
@@ -158,10 +163,12 @@ uint16_t ADS1119::read()
 
 bool ADS1119::write(uint8_t registerValue, uint8_t value)
 {
+   
+    Serial.println("BT");
     _i2c->beginTransmission(_address);
     _i2c->write(registerValue);
     _i2c->write(value);
-
+    Serial.println("BTE");
     return _i2c->endTransmission() == 0;
 }
 
@@ -190,4 +197,42 @@ uint8_t ADS1119::readRegister(ADS1119RegisterToRead registerToRead)
     _i2c->requestFrom(_address, (uint8_t)1);
 
     return _i2c->read();
+}
+
+bool ADS1119::writeConfig(ADS1119Configuration config) 
+{
+        // 8.5.3.6 RREG (0010 0rxx) / Page 26
+    // http://www.ti.com/lit/ds/sbas925a/sbas925a.pdf
+    uint8_t registerValue = 0B01000000;
+    uint8_t value = 0x0;
+
+    value |= (uint8_t(config.mux) << 5);                // XXX00000
+    value |= (uint8_t(config.gain) << 4);               // 000X0000
+    value |= (uint8_t(config.dataRate) << 2);           // 0000XX00
+    value |= (uint8_t(config.conversionMode) << 1);     // 000000X0
+    value |= (uint8_t(config.voltageReference) << 0);   // 0000000X
+    Serial.println("WRITE");
+    Serial.println(value);
+    write(registerValue, value);
+    Serial.println("SYN");
+    commandStart();
+
+    return true;
+}
+
+float ADS1119::readVoltageDirectly(ADS1119Configuration config)
+{
+    commandReadData();
+
+    uint16_t twoBytesRead =read();
+    if (twoBytesRead > 0x7FFF) 
+    {
+        twoBytesRead = 0x0;
+    }
+    uint16_t value = twoBytesRead - _offset;
+    float gain = gainAsFloat(config);
+    float referenceVoltage = referenceVoltageAsFloat(config);  
+    float voltage = referenceVoltage * (float(value) / ADS1119_RANGE) * gain;
+
+    return voltage;
 }

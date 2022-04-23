@@ -2,13 +2,14 @@
  * @Author: TZU-CHIEH,HSU
  * @Date: 2022-04-10 02:43:44
  * @LastEditors: TZU-CHIEH,HSU
- * @LastEditTime: 2022-04-13 21:42:22
+ * @LastEditTime: 2022-04-20 04:19:40
  * @Description: 
  */
 #ifndef __DATALOGGERMQTT_H__
 #define __DATALOGGERMQTT_H__
 
 #include <Arduino.h>
+#include <ArduinoJson.h>
 #include "LTEManager.h"
 #include "SoftTimer.h"
 #include "AsyncLTE.h"
@@ -51,12 +52,20 @@ class DataLoggerMQTT
             BMS_VBat,
             BMS_MODE,
             MAIN_ILL,
+            MAIN_TEMP
         };
         DataLoggerMQTTProgress progress;
 
         void nextProcess();
         void progressRestart();
         char message[DATALOGGERMQTT_MESSAGE_LEN] = "";
+
+        void publicJson();
+
+        double round2(double);
+        double round3(double);
         
 };
+
+
 #endif

@@ -27,9 +27,9 @@
 #include "usbDtrReset.h"
 #include "DataLogger\DataLogger.h"
 #include "MPPTModule\MPPTModule.h"
-#include "ButtonHelper.h"
 #include "EnvSensor.h"
 #include "I2CManager.h"
+#include "CommandHandler.h"
 
 SerialManager serialManager; // Serial 相關
 
@@ -48,12 +48,14 @@ LTEManager lteManager(serialManager);
 
 MainPowerMonitor mainPowerMonitor;
 
+CommandHandler commandHandler;
+
 // 代碼測試用
 void testModuleBegin();
 void testModuleRun();
 void onExpiredCallback(SoftTimer &timer, void *arg);
 
-SoftTimer sTimer1(20, onExpiredCallback, nullptr, SOFTTIMER_INFINITY);
+SoftTimer sTimer1(200, onExpiredCallback, nullptr, SOFTTIMER_INFINITY);
 
 unsigned long testMillis;
 OLED oled;
@@ -66,7 +68,6 @@ EnvSensor envSensor;
 I2CManager i2cManager;
 #endif
 
-ButtonHelper button1;
 
 void setup()
 {
@@ -94,11 +95,11 @@ void setup()
 #endif
 
 #ifdef MODULE_BMS_EN
-    batteryBalance.begin(); // 電池平衡
+    batteryBalance.begin(&Serial1); // 電池平衡
 #endif
 
-    // pinMode(A3, INPUT_PULLUP);
-    button1.begin(A3,BUTTON_INPUT_PULLUP);
+    pinMode(13, OUTPUT);
+
 }
 
 uint32_t ticks = 0;
@@ -109,7 +110,7 @@ uint32_t max_ticks = 606756;
 
 void loop()
 {
-
+    
     //testMillis = millis();
     serialManager.run();
 
@@ -128,10 +129,11 @@ void loop()
 
     testModuleRun();
 
-    //mainPowerMonitor.run();
+    mainPowerMonitor.run();
 
     mpptModule.run();
     envSensor.run();
+
     // ticks++;
     // if (millis() - pc_millis >= 1000)
     // {
@@ -147,6 +149,7 @@ void loop()
     // unsigned long elapsed = millis()-testMillis;
     // if (elapsed>1)
     //     Serial.println(elapsed);
+    
 }
 
 void testModuleBegin()
@@ -156,31 +159,10 @@ void testModuleBegin()
 
 void testModuleRun()
 {
-    //sTimer1.run();
-    button1.check();
-    if (!button1.ready())
-        return;
-    if (button1.isShortPressed())
-        oled.switchPage();
-    else if (button1.isLongPressed())
-    {
-        Serial.println(F("Cali ADC"));
-        mpptModule.calibrate();
-    }
+    sTimer1.run();
 }
 
 void onExpiredCallback(SoftTimer &timer, void *arg)
 {
-
-    bool state = !digitalRead(A3);
-    if (state != button_last_state)
-    {
-        button_last_state = state;
-        if (state == HIGH)
-        {
-            Serial.println(F("CALI"));
-            oled.switchPage();
-            //mpptModule.calibrate();
-        }
-    }
+    digitalWrite(13,!digitalRead(13));
 }

@@ -1,3 +1,10 @@
+/*
+ * @Author: TZU-CHIEH,HSU
+ * @Date: 2022-03-15 19:14:06
+ * @LastEditors: TZU-CHIEH,HSU
+ * @LastEditTime: 2022-04-24 03:30:48
+ * @Description: 
+ */
 #ifndef _MPPTMODULE_H__
 #define _MPPTMODULE_H__
 #include "ADS1119.h"
@@ -11,6 +18,7 @@
 #define MPPT_LOG(x)   MPPT_PRINTHEAD(); MPPT_PRINT(x)
 #define MPPT_LOGLN(x)   MPPT_PRINTHEAD(); MPPT_PRINTLN(x)
 
+
 extern I2CManager i2cManager;
 
 class MPPTModule
@@ -21,29 +29,44 @@ public:
     void scanDevices();
     void calibrate();
 
-    float valTemp[4] = {0};
-    float valTemp2[4] = {0};
+    
+
+    float getInputVoltage(uint8_t index);
+    float getInputCurrent(uint8_t index);
+    float getOutputVoltage(uint8_t index);
+    float getOutputCurrent(uint8_t index);
+    
 
 private:
-    uint8_t module1_address = 66;
-
+    uint8_t address[MPPT_DEVICES] = {64,65,66,67,68,69};
+    ADS1119 adc;
     struct ADS1119Configuration configuration;
-    ADS1119* deviceList[MPPT_DEVICES] = {0};
-    ADS1119 module1 = ADS1119(byte(66));
-    uint16_t module1_adcVal[4] = {0};
-    float module1_zco[2] = {MPPT_I_ZCO,MPPT_I_ZCO};
-    ADS1119 module2 = ADS1119(byte(64));
-    uint16_t module2_adcVal[4] = {0};
-    float module2_zco[2] = {MPPT_I_ZCO,MPPT_I_ZCO};
     
+
+    float zeroCurrentVoltage[MPPT_DEVICES][2] = {0};
+    float valTemp[MPPT_DEVICES][4] = {0};
 
     SoftTimer getAdcTimer;
     static void getAdcCallback(SoftTimer &timer,void *arg);
     
-    float readVoltage(uint8_t device,uint8_t channel);
-    void saveToTemp(float Vin,float Iin,float Vout,float Iout);
+    float readVoltage(uint8_t index,uint8_t channel);
+    void saveToTemp(uint8_t index,float Vin,float Iin,float Vout,float Iout);
+    void readMpptModule(uint8_t index);
 
+    int readIndex = 3;
+    enum Channel
+    {
+        MPPT_VIN,
+        MPPT_IIN,
+        MPPT_IOUT,
+        MPPT_VOUT,
+        LENGTH,
+    };
 
+    uint8_t currentChannel = MPPT_VIN;
+    bool onCalibrate = false;
+
+    struct ADS1119Configuration calibration;
 };
 
 #endif

@@ -14,7 +14,7 @@ void LTEManager::begin()
     serialLTE = serialManager->getSerialLTE();
     //serialLTE->println(F("[LTEM] Begin"));
 
-    LTE.begin(serialLTE,8);
+    LTE.begin(serialLTE,7);
 
     delayTimer.setInterval(100);
     delayTimer.setRepeats(SOFTTIMER_INFINITY);
